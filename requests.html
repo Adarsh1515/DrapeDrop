@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Requests to Buy - DrapeDrop</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="requests-page">
+        <div class="requests-card">
+            <div class="requests-header">
+                <button class="btn btn-secondary" id="backFromRequests"><i class="fas fa-arrow-left"></i> Back</button>
+                <h2><i class="fas fa-hand-holding-dollar"></i> Requests to Buy</h2>
+            </div>
+
+            <div class="requests-tabs">
+                <button class="tab-btn active" data-tab="pendingTab">Pending</button>
+                <button class="tab-btn" data-tab="approvedTab">Approved</button>
+                <button class="tab-btn" data-tab="rejectedTab">Rejected</button>
+            </div>
+
+            <div class="tab-content active" id="pendingTab"></div>
+            <div class="tab-content" id="approvedTab"></div>
+            <div class="tab-content" id="rejectedTab"></div>
+        </div>
+    </div>
+
+    <script src="requests.js"></script>
+</body>
+</html>

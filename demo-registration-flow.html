@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo Registration Flow - DrapeDrop</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .demo-container {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 40px 20px;
+        }
+        
+        .demo-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px;
+        }
+        
+        .demo-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+        
+        .demo-header h1 {
+            color: #333;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+        }
+        
+        .demo-header p {
+            color: #666;
+            font-size: 1.1rem;
+        }
+        
+        .flow-steps {
+            display: flex;
+            justify-content: space-between;
+            margin: 40px 0;
+            position: relative;
+        }
+        
+        .flow-steps::before {
+            content: '';
+            position: absolute;
+            top: 25px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: #e1e5e9;
+            z-index: 1;
+        }
+        
+        .step {
+            background: white;
+            border: 2px solid #e1e5e9;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #666;
+            position: relative;
+            z-index: 2;
+            transition: all 0.3s ease;
+        }
+        
+        .step.active {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+        
+        .step.completed {
+            border-color: #28a745;
+            background: #28a745;
+            color: white;
+        }
+        
+        .step-label {
+            text-align: center;
+            margin-top: 10px;
+            font-size: 0.9rem;
+            color: #666;
+        }
+        
+        .demo-buttons {
+            display: flex;
+            gap: 20px;
+            justify-content: center;
+            margin: 40px 0;
+        }
+        
+        .demo-btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .demo-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .demo-btn.secondary {
+            background: none;
+            border: 2px solid #667eea;
+            color: #667eea;
+        }
+        
+        .demo-btn.secondary:hover {
+            background: #667eea;
+            color: white;
+        }
+        
+        .demo-info {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        
+        .demo-info h3 {
+            color: #333;
+            margin-bottom: 15px;
+        }
+        
+        .demo-info ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        
+        .demo-info li {
+            margin-bottom: 8px;
+            color: #666;
+        }
+        
+        .back-link {
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .back-link a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+        
+        .back-link a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <div class="demo-card">
+            <div class="demo-header">
+                <h1><i class="fas fa-play-circle"></i> Demo Registration Flow</h1>
+                <p>Test the complete user registration and phone verification process</p>
+            </div>
+            
+            <div class="flow-steps">
+                <div class="step active" id="step1">
+                    <i class="fas fa-user-plus"></i>
+                </div>
+                <div class="step" id="step2">
+                    <i class="fas fa-mobile-alt"></i>
+                </div>
+                <div class="step" id="step3">
+                    <i class="fas fa-check-circle"></i>
+                </div>
+            </div>
+            
+            <div class="step-label">
+                <div style="display: flex; justify-content: space-between;">
+                    <span>1. User Registration</span>
+                    <span>2. Phone Verification</span>
+                    <span>3. Account Created</span>
+                </div>
+            </div>
+            
+            <div class="demo-buttons">
+                <a href="auth.html" class="demo-btn" onclick="updateStep(1)">
+                    <i class="fas fa-user-plus"></i>
+                    Start Registration
+                </a>
+                <a href="phone-verification.html" class="demo-btn secondary" onclick="updateStep(2)">
+                    <i class="fas fa-mobile-alt"></i>
+                    Test OTP Verification
+                </a>
+                <a href="test-firebase-config.html" class="demo-btn secondary">
+                    <i class="fas fa-cog"></i>
+                    Test Firebase Config
+                </a>
+                <a href="index.html" class="demo-btn secondary" onclick="updateStep(3)">
+                    <i class="fas fa-home"></i>
+                    Go to Homepage
+                </a>
+            </div>
+            
+            <div class="demo-info">
+                <h3><i class="fas fa-info-circle"></i> How to Test the Flow:</h3>
+                <ol>
+                    <li><strong>Start Registration:</strong> Click "Start Registration" to go to the auth page</li>
+                    <li><strong>Fill Form:</strong> Complete the registration form with your details</li>
+                    <li><strong>Phone Verification:</strong> You'll be redirected to phone verification page</li>
+                    <li><strong>Enter OTP:</strong> Enter the 6-digit code sent to your phone</li>
+                    <li><strong>Complete Registration:</strong> After verification, you'll be redirected to login</li>
+                    <li><strong>Login:</strong> Use your credentials to log in to the system</li>
+                </ol>
+            </div>
+            
+            <div class="demo-info">
+                <h3><i class="fas fa-exclamation-triangle"></i> Important Notes:</h3>
+                <ul>
+                    <li>Use a real phone number for OTP testing</li>
+                    <li>Ensure Firebase is properly configured</li>
+                    <li>Phone number should include country code (e.g., +91)</li>
+                    <li>OTP will be sent via SMS (real Firebase service)</li>
+                    <li>Check your phone's SMS inbox for the verification code</li>
+                </ul>
+            </div>
+            
+            <div class="back-link">
+                <a href="index.html"><i class="fas fa-arrow-left"></i> Back to Homepage</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Update step indicators
+        function updateStep(stepNumber) {
+            // Reset all steps
+            document.querySelectorAll('.step').forEach(step => {
+                step.classList.remove('active', 'completed');
+            });
+            
+            // Mark current step as active
+            document.getElementById(`step${stepNumber}`).classList.add('active');
+            
+            // Mark previous steps as completed
+            for (let i = 1; i < stepNumber; i++) {
+                document.getElementById(`step${i}`).classList.add('completed');
+            }
+        }
+        
+        // Check if user is coming from registration
+        window.onload = function() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const fromRegistration = urlParams.get('from');
+            
+            if (fromRegistration === 'registration') {
+                updateStep(2);
+            }
+        };
+    </script>
+</body>
+</html>

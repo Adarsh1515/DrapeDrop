@@ -1,0 +1,798 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login/Register - DrapeDrop</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .login-container {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .login-card {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            width: 100%;
+            max-width: 900px;
+            display: flex;
+            min-height: 600px;
+        }
+        
+        .login-sidebar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            width: 40%;
+        }
+        
+        .login-sidebar h2 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        
+        .login-sidebar p {
+            text-align: center;
+            line-height: 1.6;
+            opacity: 0.9;
+        }
+        
+        .login-main {
+            padding: 40px;
+            width: 60%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        
+        .login-tabs {
+            display: flex;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        .login-tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            font-weight: 600;
+            color: #666;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+        }
+        
+        .login-tab.active {
+            color: #667eea;
+            border-bottom-color: #667eea;
+        }
+        
+        .login-form {
+            display: none;
+        }
+        
+        .login-form.active {
+            display: block;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s ease;
+        }
+        
+        .form-group input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        
+        .submit-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+        
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+        }
+        
+        .forgot-password {
+            text-align: center;
+            margin-top: 15px;
+        }
+        
+        .forgot-password a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
+        
+        .error-message {
+            background: #fee;
+            color: #c33;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .success-message {
+            background: #efe;
+            color: #3c3;
+            padding: 10px;
+            border-radius: 5px;
+            margin-bottom: 15px;
+            font-size: 0.9rem;
+        }
+        
+        .user-type-selector {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .user-type-btn {
+            flex: 1;
+            padding: 10px;
+            border: 2px solid #e1e5e9;
+            background: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+        
+        .user-type-btn.active {
+            border-color: #667eea;
+            background: #667eea;
+            color: white;
+        }
+        
+        .back-to-home {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .back-to-home a {
+            color: #667eea;
+            text-decoration: none;
+            font-size: 0.9rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+        
+        .back-to-home a:hover {
+            text-decoration: underline;
+        }
+        
+        @media (max-width: 768px) {
+            .login-card {
+                flex-direction: column;
+                max-width: 400px;
+            }
+            
+            .login-sidebar {
+                width: 100%;
+                padding: 30px 20px;
+            }
+            
+            .login-main {
+                width: 100%;
+                padding: 30px 20px;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            /* Make phone input responsive on mobile */
+            .form-group div[style*="display: flex"] {
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .form-group div[style*="display: flex"] select {
+                width: 100% !important;
+            }
+        }
+
+        .image-preview {
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            padding: 30px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: #f8f9fa;
+            min-height: 150px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* OTP UI */
+        .otp-actions { display: grid; grid-template-columns: auto 1fr auto auto; gap: 8px; align-items: center; margin-top: 8px; }
+        .otp-actions .btn-inline { padding: 8px 12px; border-radius: 6px; border: none; background: #667eea; color: #fff; cursor: pointer; }
+        .otp-actions .btn-inline.secondary { background: #44a08d; }
+        .otp-actions input { padding: 10px 12px; border: 2px solid #e1e5e9; border-radius: 6px; }
+        .otp-status { font-size: 0.9rem; font-weight: 600; }
+        .otp-status.ok { color: #2ecc71; }
+        .otp-status.err { color: #e74c3c; }
+        .otp-for-seller { display: none; }
+
+        /* New product animation */
+        @keyframes slideInFromTop {
+            0% {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Delete product animation */
+        @keyframes slideOutToBottom {
+            0% {
+                opacity: 1;
+                transform: scale(1);
+            }
+            100% {
+                opacity: 0;
+                transform: scale(0.8);
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-sidebar">
+                <h2><i class="fas fa-tshirt"></i> DrapeDrop</h2>
+                <p>Your trusted platform for buying and renting pre-loved dresses. Join our community of fashion enthusiasts!</p>
+            </div>
+            
+            <div class="login-main">
+                <div class="login-tabs">
+                    <div class="login-tab active" onclick="switchTab('login')">Login</div>
+                    <div class="login-tab" onclick="switchTab('register')">Register</div>
+                </div>
+                
+                <!-- Login Form -->
+                <div class="login-form active" id="loginForm">
+                    <div class="user-type-selector">
+                        <button class="user-type-btn active" onclick="selectUserType('user')">User</button>
+                        <button class="user-type-btn" onclick="selectUserType('admin')">Seller</button>
+                    </div>
+                    
+                    <div id="loginMessage"></div>
+                    
+                    <form onsubmit="handleLogin(event)">
+                        <div class="form-group">
+                            <label for="loginEmail">Email Address</label>
+                            <input type="email" id="loginEmail" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="loginPassword">Password</label>
+                            <input type="password" id="loginPassword" required>
+                        </div>
+                        
+                        <button type="submit" class="submit-btn">
+                            <i class="fas fa-sign-in-alt"></i>
+                            Login
+                        </button>
+                    </form>
+                    
+                    <div class="forgot-password">
+                        <a href="#" onclick="showForgotPassword()">Forgot Password?</a>
+                    </div>
+                </div>
+                
+                <!-- Register Form -->
+                <div class="login-form" id="registerForm">
+                    <div class="user-type-selector">
+                        <button class="user-type-btn active" onclick="selectUserType('user')">User</button>
+                        <button class="user-type-btn" onclick="selectUserType('admin')">Seller</button>
+                    </div>
+                    
+                    <div id="registerMessage"></div>
+                    
+                    <form onsubmit="handleRegister(event)">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="registerFirstName">First Name</label>
+                                <input type="text" id="registerFirstName" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="registerLastName">Last Name</label>
+                                <input type="text" id="registerLastName" required>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="registerEmail">Email Address</label>
+                            <input type="email" id="registerEmail" required>
+                            <div class="otp-actions otp-for-seller" id="emailOtpRow">
+                                <button type="button" class="btn-inline" onclick="sendOtp('email')">Send OTP</button>
+                                <input type="text" id="emailOtpInput" placeholder="Enter OTP">
+                                <button type="button" class="btn-inline secondary" onclick="verifyOtp('email')">Verify</button>
+                                <span class="otp-status" id="emailOtpStatus"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="registerPhone">Phone Number</label>
+                            <div style="display: flex; gap: 10px;">
+                                <select id="registerPhoneCountryCode" style="width: 120px; padding: 12px 15px; border: 2px solid #e1e5e9; border-radius: 8px; font-size: 1rem; background: white;">
+                                    <option value="+1">🇺🇸 +1</option>
+                                    <option value="+44">🇬🇧 +44</option>
+                                    <option value="+91">🇮🇳 +91</option>
+                                    <option value="+86">🇨🇳 +86</option>
+                                    <option value="+81">🇯🇵 +81</option>
+                                    <option value="+49">🇩🇪 +49</option>
+                                    <option value="+33">🇫🇷 +33</option>
+                                    <option value="+39">🇮🇹 +39</option>
+                                    <option value="+34">🇪🇸 +34</option>
+                                    <option value="+31">🇳🇱 +31</option>
+                                    <option value="+46">🇸🇪 +46</option>
+                                    <option value="+47">🇳🇴 +47</option>
+                                    <option value="+45">🇩🇰 +45</option>
+                                    <option value="+358">🇫🇮 +358</option>
+                                    <option value="+41">🇨🇭 +41</option>
+                                    <option value="+43">🇦🇹 +43</option>
+                                    <option value="+32">🇧🇪 +32</option>
+                                    <option value="+48">🇵🇱 +48</option>
+                                    <option value="+420">🇨🇿 +420</option>
+                                    <option value="+36">🇭🇺 +36</option>
+                                    <option value="+380">🇺🇦 +380</option>
+                                    <option value="+7">🇷🇺 +7</option>
+                                    <option value="+82">🇰🇷 +82</option>
+                                    <option value="+65">🇸🇬 +65</option>
+                                    <option value="+60">🇲🇾 +60</option>
+                                    <option value="+66">🇹🇭 +66</option>
+                                    <option value="+84">🇻🇳 +84</option>
+                                    <option value="+62">🇮🇩 +62</option>
+                                    <option value="+63">🇵🇭 +63</option>
+                                    <option value="+61">🇦🇺 +61</option>
+                                    <option value="+64">🇳🇿 +64</option>
+                                    <option value="+27">🇿🇦 +27</option>
+                                    <option value="+20">🇪🇬 +20</option>
+                                    <option value="+234">🇳🇬 +234</option>
+                                    <option value="+254">🇰🇪 +254</option>
+                                    <option value="+52">🇲🇽 +52</option>
+                                    <option value="+55">🇧🇷 +55</option>
+                                    <option value="+54">🇦🇷 +54</option>
+                                    <option value="+56">🇨🇱 +56</option>
+                                    <option value="+57">🇨🇴 +57</option>
+                                    <option value="+58">🇻🇪 +58</option>
+                                    <option value="+51">🇵🇪 +51</option>
+                                    <option value="+593">🇪🇨 +593</option>
+                                    <option value="+595">🇵🇾 +595</option>
+                                    <option value="+598">🇺🇾 +598</option>
+                                    <option value="+591">🇧🇴 +591</option>
+                                    <option value="+507">🇵🇦 +507</option>
+                                    <option value="+506">🇨🇷 +506</option>
+                                    <option value="+502">🇬🇹 +502</option>
+                                    <option value="+503">🇸🇻 +503</option>
+                                    <option value="+504">🇭🇳 +504</option>
+                                    <option value="+505">🇳🇮 +505</option>
+                                    <option value="+501">🇧🇿 +501</option>
+                                </select>
+                                <input type="tel" id="registerPhone" required style="flex: 1;">
+                            </div>
+                            <div class="otp-actions otp-for-seller" id="phoneOtpRow">
+                                <button type="button" class="btn-inline" onclick="sendOtp('phone')">Send OTP</button>
+                                <input type="text" id="phoneOtpInput" placeholder="Enter OTP">
+                                <button type="button" class="btn-inline secondary" onclick="verifyOtp('phone')">Verify</button>
+                                <span class="otp-status" id="phoneOtpStatus"></span>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="registerPassword">Password</label>
+                            <input type="password" id="registerPassword" required minlength="6">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="registerConfirmPassword">Confirm Password</label>
+                            <input type="password" id="registerConfirmPassword" required minlength="6">
+                        </div>
+                        
+                        <button type="submit" class="submit-btn">
+                            <i class="fas fa-user-plus"></i>
+                            Register
+                        </button>
+                    </form>
+                </div>
+                
+                <div class="back-to-home">
+                    <a href="index.html">
+                        <i class="fas fa-arrow-left"></i>
+                        Back to Homepage
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentUserType = 'user';
+        let currentTab = 'login';
+        
+        // Load existing users and admins from localStorage
+        let users = [];
+        let admins = [];
+        
+        const savedUsers = localStorage.getItem('drapedrop_users');
+        const savedAdmins = localStorage.getItem('drapedrop_admins');
+        
+        if (savedUsers) {
+            users = JSON.parse(savedUsers);
+        } else {
+            // Default users
+            users = [
+                {
+                    id: 1,
+                    firstName: 'John',
+                    lastName: 'Doe',
+                    email: 'user@example.com',
+                    phone: '9876543210',
+                    password: 'user123',
+                    type: 'user',
+                    createdAt: new Date().toISOString()
+                }
+            ];
+            localStorage.setItem('drapedrop_users', JSON.stringify(users));
+        }
+        
+        if (savedAdmins) {
+            admins = JSON.parse(savedAdmins);
+        } else {
+            // Default admin
+            admins = [
+                {
+                    id: 1,
+                    firstName: 'Seller',
+                    lastName: 'User',
+                    email: 'admin@drapedrop.com',
+                    phone: '9876543210',
+                    password: 'admin123',
+                    type: 'admin',
+                    createdAt: new Date().toISOString()
+                }
+            ];
+            localStorage.setItem('drapedrop_admins', JSON.stringify(admins));
+        }
+        
+        function switchTab(tab) {
+            currentTab = tab;
+            
+            // Update tab styling
+            document.querySelectorAll('.login-tab').forEach(t => t.classList.remove('active'));
+            event.target.classList.add('active');
+            
+            // Show/hide forms
+            document.querySelectorAll('.login-form').forEach(f => f.classList.remove('active'));
+            document.getElementById(tab + 'Form').classList.add('active');
+            
+            // Clear messages
+            document.getElementById('loginMessage').innerHTML = '';
+            document.getElementById('registerMessage').innerHTML = '';
+
+            // Toggle OTP rows when entering Register tab for Seller
+            const otpRows = document.querySelectorAll('.otp-for-seller');
+            otpRows.forEach(row => row.style.display = (tab === 'register' && currentUserType === 'admin') ? 'grid' : 'none');
+        }
+        
+        function selectUserType(type) {
+            currentUserType = type;
+            
+            // Update button styling
+            document.querySelectorAll('.user-type-btn').forEach(btn => btn.classList.remove('active'));
+            event.target.classList.add('active');
+
+            // Toggle OTP rows only for seller registration
+            const otpRows = document.querySelectorAll('.otp-for-seller');
+            otpRows.forEach(row => row.style.display = (currentTab === 'register' && type === 'admin') ? 'grid' : 'none');
+        }
+        
+        function showMessage(elementId, message, type) {
+            const element = document.getElementById(elementId);
+            element.innerHTML = `<div class="${type}-message">${message}</div>`;
+        }
+        
+        function handleLogin(event) {
+            event.preventDefault();
+            
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
+            
+            // Check if user exists
+            let user = null;
+            if (currentUserType === 'user') {
+                user = users.find(u => u.email === email && u.password === password);
+            } else {
+                user = admins.find(a => a.email === email && a.password === password);
+            }
+            
+            if (user) {
+                // Store current user in session
+                const sessionData = {
+                    id: user.id,
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                    email: user.email,
+                    type: user.type,
+                    loginTime: new Date().toISOString()
+                };
+                
+                localStorage.setItem('drapedrop_currentUser', JSON.stringify(sessionData));
+                
+                showMessage('loginMessage', 'Login successful! Redirecting...', 'success');
+                
+                // Redirect: users -> index; sellers -> onboarding until finished
+                setTimeout(() => {
+                    if (user.type === 'admin') {
+                        const key = 'drapedrop_onboarding_' + user.email;
+                        const ob = JSON.parse(localStorage.getItem(key) || 'null');
+                        if (!ob || !ob.submitted) {
+                            window.location.href = 'onboarding.html';
+                        } else {
+                            window.location.href = 'index.html';
+                        }
+                    } else {
+                        window.location.href = 'index.html';
+                    }
+                }, 1000);
+            } else {
+                showMessage('loginMessage', 'Invalid email or password. Please try again.', 'error');
+            }
+        }
+        
+        function handleRegister(event) {
+            event.preventDefault();
+            
+            const firstName = document.getElementById('registerFirstName').value;
+            const lastName = document.getElementById('registerLastName').value;
+            const email = document.getElementById('registerEmail').value;
+            const countryCode = document.getElementById('registerPhoneCountryCode').value;
+            const phone = document.getElementById('registerPhone').value;
+            const fullPhone = countryCode + phone;
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('registerConfirmPassword').value;
+            
+            // Validation
+            if (password !== confirmPassword) {
+                showMessage('registerMessage', 'Passwords do not match!', 'error');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showMessage('registerMessage', 'Password must be at least 6 characters long!', 'error');
+                return;
+            }
+            
+            // Check if email already exists
+            const existingUser = users.find(u => u.email === email);
+            const existingAdmin = admins.find(a => a.email === email);
+            
+            if (existingUser || existingAdmin) {
+                showMessage('registerMessage', 'Email already registered! Please use a different email.', 'error');
+                return;
+            }
+            
+            // For sellers, ensure OTP verified for both email and phone
+            if (currentUserType === 'admin') {
+                const emailOk = sessionStorage.getItem('otp_email_verified') === 'true';
+                const phoneOk = sessionStorage.getItem('otp_phone_verified') === 'true';
+                if (!emailOk || !phoneOk) {
+                    showMessage('registerMessage', 'Please verify both Email and Phone via OTP before registering.', 'error');
+                    return;
+                }
+            }
+
+            // Create new user/admin
+            const newUser = {
+                id: Date.now(),
+                firstName,
+                lastName,
+                email,
+                phone: fullPhone,
+                password,
+                type: currentUserType,
+                createdAt: new Date().toISOString()
+            };
+            
+            if (currentUserType === 'user') {
+                users.push(newUser);
+                localStorage.setItem('drapedrop_users', JSON.stringify(users));
+                showMessage('registerMessage', 'Registration successful! You can now login.', 'success');
+                event.target.reset();
+                setTimeout(() => { switchTab('login'); }, 2000);
+            } else {
+                admins.push(newUser);
+                localStorage.setItem('drapedrop_admins', JSON.stringify(admins));
+                // Auto-create session for seller and go to onboarding
+                const sessionData = {
+                    id: newUser.id,
+                    firstName: newUser.firstName,
+                    lastName: newUser.lastName,
+                    email: newUser.email,
+                    type: newUser.type,
+                    loginTime: new Date().toISOString()
+                };
+                localStorage.setItem('drapedrop_currentUser', JSON.stringify(sessionData));
+                showMessage('registerMessage', 'Registration successful! Redirecting to onboarding...', 'success');
+                setTimeout(() => { window.location.href = 'onboarding.html'; }, 800);
+            }
+        }
+
+        // OTP simulation logic
+        const otpStore = { email: null, phone: null };
+        function sendOtp(kind) {
+            let targetValue;
+            if (kind === 'email') {
+                targetValue = document.getElementById('registerEmail').value;
+            } else {
+                const countryCode = document.getElementById('registerPhoneCountryCode').value;
+                const phone = document.getElementById('registerPhone').value;
+                targetValue = countryCode + phone;
+            }
+            if (!targetValue) { alert('Please enter ' + (kind === 'email' ? 'email' : 'phone') + ' first.'); return; }
+            const code = Math.floor(100000 + Math.random() * 900000).toString();
+            otpStore[kind] = code;
+            // Simulate sending by showing an alert. In real app integrate email/SMS API.
+            alert(`Your ${kind.toUpperCase()} OTP is: ${code}`);
+        }
+        function verifyOtp(kind) {
+            const inputId = kind === 'email' ? 'emailOtpInput' : 'phoneOtpInput';
+            const statusId = kind === 'email' ? 'emailOtpStatus' : 'phoneOtpStatus';
+            const val = document.getElementById(inputId).value.trim();
+            const ok = val && otpStore[kind] && val === otpStore[kind];
+            const statusEl = document.getElementById(statusId);
+            if (ok) {
+                statusEl.textContent = 'Verified';
+                statusEl.className = 'otp-status ok';
+                sessionStorage.setItem(`otp_${kind}_verified`, 'true');
+            } else {
+                statusEl.textContent = 'Invalid OTP';
+                statusEl.className = 'otp-status err';
+                sessionStorage.setItem(`otp_${kind}_verified`, 'false');
+            }
+        }
+
+        // When switching tabs, ensure OTP rows visibility reflects seller state
+        (function observeTab() {
+            const originalSwitch = switchTab;
+        })();
+        
+        function showForgotPassword() {
+            const email = prompt('Enter your email address to reset password:');
+            if (email) {
+                alert('Password reset link has been sent to your email address. Please check your inbox.');
+            }
+        }
+        
+        // Check if user is already logged in
+        window.onload = function() {
+            const currentUser = localStorage.getItem('drapedrop_currentUser');
+            if (currentUser) {
+                // User is already logged in, redirect to dashboard
+                window.location.href = 'index.html';
+            }
+        };
+
+        function processOrder(index) {
+            const cart = JSON.parse(localStorage.getItem('drapedrop_cart') || '[]');
+            const item = cart[index];
+            
+            if (item) {
+                // Remove the item from cart
+                cart.splice(index, 1);
+                localStorage.setItem('drapedrop_cart', JSON.stringify(cart));
+                
+                // Redirect to checkout page with the item
+                const action = item.type === 'sale' ? 'buy' : 'rent';
+                window.location.href = `checkout.html?id=${item.id}&action=${action}`;
+            }
+        }
+
+        // Image preview function
+        function previewImage(event) {
+            const file = event.target.files[0];
+            const preview = document.getElementById('imagePreview');
+            
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.innerHTML = `
+                        <img src="${e.target.result}" alt="Preview" style="max-width: 100%; max-height: 200px; object-fit: cover; border-radius: 8px;">
+                        <p style="margin-top: 10px; font-size: 0.9rem; color: #666;">Image selected: ${file.name}</p>
+                    `;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Instant product addition (no delays)
+        function addProductToDisplayInstantly(product) {
+            // Find grid immediately
+            let productsGrid = document.querySelector('.products-grid');
+            
+            // Create product card
+            const productCard = document.createElement('div');
+            productCard.className = 'product-card new-product';
+            
+            // Add to beginning of grid instantly
+            productsGrid.insertBefore(productCard, productsGrid.firstChild);
+            
+            // Immediate highlight
+            productCard.style.boxShadow = '0 0 20px rgba(102, 126, 234, 0.3)';
+        }
+
+        // Improved product addition flow
+        setTimeout(() => {
+            console.log('Refreshing products display to show new product...');
+            refreshProductsDisplay();
+            
+            // Double-check: if still no products visible, force a complete refresh
+            setTimeout(() => {
+                const visibleProducts = document.querySelectorAll('.product-card');
+                if (visibleProducts.length === 0) {
+                    console.log('No products visible, forcing complete refresh...');
+                    showAdminDashboard(); // Force reload
+                }
+            }, 500);
+        }, 200);
+    </script>
+</body>
+</html>

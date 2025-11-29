@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shopping Cart - DrapeDrop</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .cart-page {
+            background: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .cart-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .cart-header h1 {
+            font-size: 2rem;
+            margin: 0;
+        }
+        
+        .back-button {
+            background: rgba(255,255,255,0.2);
+            color: white;
+            border: 1px solid rgba(255,255,255,0.3);
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s ease;
+        }
+        
+        .back-button:hover {
+            background: rgba(255,255,255,0.3);
+        }
+        
+        .cart-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .cart-items {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+        
+        .cart-item {
+            display: flex;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            transition: background-color 0.3s ease;
+        }
+        
+        .cart-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .cart-item:last-child {
+            border-bottom: none;
+        }
+        
+        .cart-item-image {
+            width: 100px;
+            height: 100px;
+            object-fit: cover;
+            border-radius: 10px;
+            margin-right: 20px;
+        }
+        
+        .cart-item-details {
+            flex: 1;
+        }
+        
+        .cart-item-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 8px;
+        }
+        
+        .cart-item-info {
+            color: #666;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+        
+        .cart-item-price {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+        
+        .cart-item-actions {
+            display: flex;
+            flex-direction: row;
+            gap: 10px;
+            align-items: center;
+            justify-content: flex-end;
+        }
+        
+        .btn-small {
+            padding: 8px 15px;
+            font-size: 0.9rem;
+        }
+        
+        .remove-btn {
+            background: #ff6b6b;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+        
+        .remove-btn:hover {
+            background: #ff5252;
+            transform: translateY(-1px);
+        }
+        
+        .cart-summary {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            padding: 30px;
+        }
+        
+        .cart-total {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 0;
+            border-bottom: 2px solid #eee;
+            margin-bottom: 20px;
+        }
+        
+        .total-label {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .total-amount {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+        
+        .cart-actions {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+        
+        .empty-cart {
+            text-align: center;
+            padding: 60px 20px;
+            color: #666;
+        }
+        
+        .empty-cart i {
+            font-size: 4rem;
+            color: #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .empty-cart h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        
+        .empty-cart p {
+            margin-bottom: 30px;
+        }
+        
+        @media (max-width: 768px) {
+            .cart-item {
+                flex-direction: column;
+                text-align: center;
+                gap: 15px;
+            }
+            
+            .cart-item-image {
+                margin-right: 0;
+            }
+            
+            .cart-actions {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="cart-page">
+        <div class="cart-header">
+            <h1><i class="fas fa-shopping-cart"></i> Shopping Cart</h1>
+            <button class="back-button" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i>
+                Back to Products
+            </button>
+        </div>
+        
+        <div class="cart-container" id="cartContainer">
+            <!-- Cart items will be loaded here -->
+        </div>
+    </div>
+
+    <script>
+        // Load cart from localStorage
+        function loadCart() {
+            const cart = JSON.parse(localStorage.getItem('drapedrop_cart') || '[]');
+            const container = document.getElementById('cartContainer');
+            
+            if (cart.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-cart">
+                        <i class="fas fa-shopping-cart"></i>
+                        <h2>Your cart is empty</h2>
+                        <p>Looks like you haven't added any items to your cart yet.</p>
+                        <button class="btn btn-primary" onclick="goBack()">
+                            <i class="fas fa-shopping-bag"></i>
+                            Start Shopping
+                        </button>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Calculate total
+            const total = cart.reduce((sum, item) => {
+                return sum + (item.type === 'sale' ? item.currentPrice : item.rentPrice);
+            }, 0);
+            
+            container.innerHTML = `
+                <div class="cart-items">
+                    ${cart.map((item, index) => `
+                        <div class="cart-item">
+                            <img src="${item.image}" alt="${item.name}" class="cart-item-image">
+                            <div class="cart-item-details">
+                                <div class="cart-item-title">${item.name}</div>
+                                <div class="cart-item-info">
+                                    Brand: ${item.brand} | Color: ${item.color} | Size: ${item.size}<br>
+                                    Condition: ${item.condition} | Type: ${item.type === 'sale' ? 'For Sale' : 'For Rent'}
+                                </div>
+                                <div class="cart-item-price">
+                                    ${item.type === 'sale' ? 
+                                        `₹${item.currentPrice.toLocaleString('en-IN')}` : 
+                                        `₹${item.rentPrice.toLocaleString('en-IN')}/day`
+                                    }
+                                </div>
+                            </div>
+                            <div class="cart-item-actions">
+                                <button class="btn btn-primary btn-small" onclick="processOrder(${index})">
+                                    <i class="fas fa-credit-card"></i>
+                                    ${item.type === 'sale' ? 'Buy Now' : 'Rent Now'}
+                                </button>
+                                <button class="remove-btn" onclick="removeFromCart(${index})">
+                                    <i class="fas fa-trash"></i>
+                                    Remove
+                                </button>
+                            </div>
+                        </div>
+                    `).join('')}
+                </div>
+                
+                <div class="cart-summary">
+                    <div class="cart-total">
+                        <span class="total-label">Total Amount:</span>
+                        <span class="total-amount">₹${total.toLocaleString('en-IN')}</span>
+                    </div>
+                    <div class="cart-actions">
+                        <button class="btn btn-primary" onclick="checkout()">
+                            <i class="fas fa-credit-card"></i>
+                            Proceed to Checkout
+                        </button>
+                        <button class="btn btn-secondary" onclick="clearCart()">
+                            <i class="fas fa-trash"></i>
+                            Clear Cart
+                        </button>
+                        <button class="btn btn-secondary" onclick="goBack()">
+                            <i class="fas fa-arrow-left"></i>
+                            Continue Shopping
+                        </button>
+                    </div>
+                </div>
+            `;
+        }
+        
+        function processOrder(index) {
+            const cart = JSON.parse(localStorage.getItem('drapedrop_cart') || '[]');
+            const item = cart[index];
+            
+            if (item) {
+                // Remove the item from cart
+                cart.splice(index, 1);
+                localStorage.setItem('drapedrop_cart', JSON.stringify(cart));
+                
+                // Redirect to checkout page with the item
+                const action = item.type === 'sale' ? 'buy' : 'rent';
+                window.location.href = `checkout.html?id=${item.id}&action=${action}`;
+            }
+        }
+        
+        function removeFromCart(index) {
+            let cart = JSON.parse(localStorage.getItem('drapedrop_cart') || '[]');
+            cart.splice(index, 1);
+            localStorage.setItem('drapedrop_cart', JSON.stringify(cart));
+            loadCart();
+        }
+        
+        function clearCart() {
+            if (confirm('Are you sure you want to clear your cart?')) {
+                localStorage.removeItem('drapedrop_cart');
+                loadCart();
+            }
+        }
+        
+        function checkout() {
+            const cart = JSON.parse(localStorage.getItem('drapedrop_cart') || '[]');
+            const total = cart.reduce((sum, item) => {
+                return sum + (item.type === 'sale' ? item.currentPrice : item.rentPrice);
+            }, 0);
+            
+            const address = prompt('Please enter your delivery address:');
+            if (address) {
+                alert(`Order placed successfully!\n\nTotal: ₹${total.toLocaleString('en-IN')}\nDelivery to: ${address}\n\nThank you for shopping with DrapeDrop!`);
+                localStorage.removeItem('drapedrop_cart');
+                loadCart();
+            }
+        }
+        
+        function goBack() {
+            // Check if user is logged in
+            const currentUser = localStorage.getItem('drapedrop_currentUser');
+            
+            if (currentUser) {
+                // User is logged in, go back to index.html which will show dashboard
+                window.location.href = 'index.html';
+            } else {
+                // User is not logged in, go to homepage
+                window.location.href = 'index.html';
+            }
+        }
+        
+        // Load cart when page loads
+        window.onload = function() {
+            loadCart();
+        };
+    </script>
+</body>
+</html> 

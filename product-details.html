@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Product Details - DrapeDrop</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .product-details-page {
+            background: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .back-button {
+            background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            margin-bottom: 30px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .back-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .product-details-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 50px;
+            align-items: start;
+        }
+        
+        .product-image-section {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 20px;
+        }
+
+        .image-viewer {
+            position: relative;
+            border-radius: 12px;
+            background: white;
+            border: 1px solid #eee;
+            height: 480px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .image-viewer img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .thumbs-row {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .thumb {
+            border: 2px dashed #ddd;
+            background: #fff;
+            border-radius: 8px;
+            height: 76px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .thumb img { width: 100%; height: 100%; object-fit: cover; }
+        .thumb span { position: absolute; bottom: 4px; left: 6px; right: 6px; font-size: 11px; color: #333; background: rgba(255,255,255,0.9); border-radius: 4px; padding: 2px 4px; text-align: center; }
+        .thumb.disabled { opacity: 0.4; cursor: default; }
+        .thumb.active { border-color: #667eea; box-shadow: 0 0 0 2px rgba(102,126,234,0.15) inset; }
+        
+        .product-info-section {
+            padding: 20px;
+        }
+        
+        .product-detail-title {
+            font-size: 2.5rem;
+            color: #333;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 15px;
+        }
+        
+        .product-detail-grid {
+            display: grid;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .rating-row { display: flex; align-items: center; gap: 8px; }
+        .stars { color: #f5a623; }
+        
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .detail-label {
+            font-weight: 600;
+            color: #666;
+            font-size: 1.1rem;
+            min-width: 150px;
+        }
+        
+        .detail-value {
+            color: #333;
+            font-weight: 500;
+            font-size: 1.1rem;
+        }
+        
+        .price-highlight {
+            color: #667eea;
+            font-weight: 700;
+            font-size: 1.3rem;
+        }
+        
+        .product-description {
+            margin: 30px 0;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .product-description h3 {
+            color: #333;
+            margin-bottom: 15px;
+            font-size: 1.3rem;
+        }
+        
+        .product-description p {
+            color: #666;
+            line-height: 1.8;
+            font-size: 1.1rem;
+        }
+        
+        .product-actions-detail {
+            display: flex;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .btn-large {
+            padding: 15px 30px;
+            font-size: 1.1rem;
+        }
+        
+        @media (max-width: 768px) {
+            .product-details-container {
+                grid-template-columns: 1fr;
+                gap: 30px;
+            }
+            .image-viewer { height: 360px; }
+            .thumbs-row { grid-template-columns: repeat(4, 1fr); }
+            
+            .product-detail-title {
+                font-size: 2rem;
+            }
+            
+            .detail-item {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 8px;
+            }
+            
+            .product-actions-detail {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="product-details-page">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+            <button class="back-button" onclick="goBack()">
+                <i class="fas fa-arrow-left"></i>
+                Back to Products
+            </button>
+            <div id="userInfo" style="color: #667eea; font-weight: 600;"></div>
+        </div>
+        
+        <div class="product-details-container" id="productDetails">
+            <!-- Product details will be loaded here -->
+        </div>
+    </div>
+
+    <script>
+        // Get product ID from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const productId = parseInt(urlParams.get('id'));
+        
+        // Load products from localStorage
+        let products = [];
+        const savedProducts = localStorage.getItem('drapedrop_products');
+        if (savedProducts) {
+            products = JSON.parse(savedProducts);
+        } else {
+            // Default products if none saved
+            products = [
+                {
+                    id: 1,
+                    name: "Elegant Black Evening Dress",
+                    brand: "Fashion House",
+                    color: "Black",
+                    size: "M",
+                    condition: "Excellent",
+                    originalPrice: 24999,
+                    currentPrice: 12499,
+                    rentPrice: 1999,
+                    type: "sale",
+                    image: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=400&h=500&fit=crop",
+                    description: "Beautiful black evening dress perfect for special occasions. Worn only twice, excellent condition."
+                },
+                {
+                    id: 2,
+                    name: "Summer Floral Dress",
+                    brand: "Spring Collection",
+                    color: "Blue",
+                    size: "S",
+                    condition: "Good",
+                    originalPrice: 7499,
+                    currentPrice: 3749,
+                    rentPrice: 1199,
+                    type: "rent",
+                    image: "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=400&h=500&fit=crop",
+                    description: "Light and comfortable summer dress with floral pattern. Perfect for outdoor events."
+                },
+                {
+                    id: 3,
+                    name: "Red Cocktail Dress",
+                    brand: "Elegance",
+                    color: "Red",
+                    size: "L",
+                    condition: "Very Good",
+                    originalPrice: 16699,
+                    currentPrice: 8349,
+                    rentPrice: 1599,
+                    type: "sale",
+                    image: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=400&h=500&fit=crop",
+                    description: "Stunning red cocktail dress for parties and events. Great condition with minor wear."
+                }
+            ];
+        }
+        
+        // Find the product
+        const product = products.find(p => p.id === productId);
+        
+        function loadProductDetails() {
+            const container = document.getElementById('productDetails');
+            
+            if (product) {
+                const images = product.images || {};
+                const primary = product.image || images.front || images.full || images.side || images.back || images.other || product.image;
+                container.innerHTML = `
+                    <div class="product-image-section">
+                        <div class="image-viewer" id="imageViewer"><img src="${primary}" alt="${product.name}"></div>
+                        <div class="thumbs-row">
+                            ${['front','back','side','full','other'].map(key => {
+                                const label = key==='front'?'Front View':key==='back'?'Back View':key==='side'?'Side View':key==='full'?'Full View':'Other';
+                                const src = images[key];
+                                if (!src) {
+                                    return `<div class=\"thumb disabled\"><span>${label}</span></div>`;
+                                }
+                                const active = src===primary ? 'active' : '';
+                                return `<div class=\"thumb ${active}\" onclick=\"setMainImage('${key}')\"><img src=\"${src}\" alt=\"${label}\"><span>${label}</span></div>`;
+                            }).join('')}
+                        </div>
+                        <div class="product-description">
+                            <h3>Description</h3>
+                            <p>${product.description}</p>
+                        </div>
+                        <div class="product-description">
+                            <h3>Feedback / Reviews</h3>
+                            <p>No reviews yet.</p>
+                        </div>
+                    </div>
+                    <div class="product-info-section">
+                        <h1 class="product-detail-title">${product.name}</h1>
+                        <div class="product-detail-grid">
+                            <div class="detail-item">
+                                <span class="detail-label">Brand:</span>
+                                <span class="detail-value">${product.brand}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Rating:</span>
+                                <span class="detail-value"><span class="stars">★★★★★</span> (4.8)</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Color:</span>
+                                <span class="detail-value">${product.color}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Size:</span>
+                                <span class="detail-value">${product.size}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Condition:</span>
+                                <span class="detail-value">${product.condition}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Type:</span>
+                                <span class="detail-value">${product.type === 'sale' ? 'For Sale' : 'For Rent'}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Original Price:</span>
+                                <span class="detail-value">₹${product.originalPrice.toLocaleString('en-IN')}</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">${product.type === 'sale' ? 'Sale Price:' : 'Rent Price:'}</span>
+                                <span class="detail-value price-highlight">
+                                    ${product.type === 'sale' ? 
+                                        `₹${product.currentPrice.toLocaleString('en-IN')}` : 
+                                        `₹${product.rentPrice.toLocaleString('en-IN')}/day`
+                                    }
+                                </span>
+                            </div>
+                        </div>
+                        <div class="product-actions-detail">
+                            <button class="btn btn-primary btn-large" onclick="addToCart(${product.id})">
+                                <i class="fas fa-cart-plus"></i>
+                                ${product.type === 'sale' ? 'Buy Now' : 'Rent Now'}
+                            </button>
+                            <button class="btn btn-secondary btn-large" onclick="goBack()">
+                                <i class="fas fa-arrow-left"></i>
+                                Back to Products
+                            </button>
+                        </div>
+                    </div>
+                `;
+            } else {
+                container.innerHTML = `
+                    <div style="text-align: center; padding: 50px;">
+                        <h2>Product Not Found</h2>
+                        <p>The product you're looking for doesn't exist.</p>
+                        <button class="btn btn-primary" onclick="goBack()">Go Back</button>
+                    </div>
+                `;
+            }
+        }
+        
+        function goBack() {
+            // Check if user is logged in by looking for user data in localStorage
+            const currentUser = localStorage.getItem('drapedrop_currentUser');
+            
+            if (currentUser) {
+                // User is logged in, redirect to index.html which will show the dashboard
+                window.location.href = 'index.html';
+            } else {
+                // User is not logged in, go to homepage
+                window.location.href = 'index.html';
+            }
+        }
+        
+        function setMainImage(slotKey) {
+            const images = (product && product.images) || {};
+            const src = images[slotKey];
+            if (!src) return;
+            const viewer = document.getElementById('imageViewer');
+            if (viewer) {
+                viewer.innerHTML = `<img src="${src}" alt="${slotKey}">`;
+            }
+            // update active thumb state
+            document.querySelectorAll('.thumb').forEach(t => t.classList.remove('active'));
+            const labelMap = { front: 'Front View', back: 'Back View', side: 'Side View', full: 'Full View', other: 'Other' };
+            const thumbs = document.querySelectorAll('.thumbs-row .thumb');
+            thumbs.forEach(div => {
+                const text = div.querySelector('span')?.textContent || '';
+                if (text === labelMap[slotKey]) {
+                    div.classList.add('active');
+                }
+            });
+        }
+
+        function addToCart(productId) {
+            // Check if user is logged in
+            const currentUser = localStorage.getItem('drapedrop_currentUser');
+            
+            if (!currentUser) {
+                alert('Please log in to add items to cart!');
+                window.location.href = 'index.html';
+                return;
+            }
+            
+            // Get existing cart from localStorage
+            let cart = JSON.parse(localStorage.getItem('drapedrop_cart') || '[]');
+            
+            // Add product to cart
+            const productToAdd = products.find(p => p.id === productId);
+            if (productToAdd) {
+                cart.push(productToAdd);
+                localStorage.setItem('drapedrop_cart', JSON.stringify(cart));
+                
+                // Show success message
+                alert(`${productToAdd.name} added to cart successfully!`);
+            }
+        }
+        
+        function displayUserInfo() {
+            const userInfo = document.getElementById('userInfo');
+            const currentUser = localStorage.getItem('drapedrop_currentUser');
+            
+            if (currentUser) {
+                const user = JSON.parse(currentUser);
+                userInfo.innerHTML = `Welcome, ${user.name}!`;
+            } else {
+                userInfo.innerHTML = '';
+            }
+        }
+        
+        // Load product details when page loads
+        window.onload = function() {
+            loadProductDetails();
+            displayUserInfo();
+        };
+    </script>
+</body>
+</html> 

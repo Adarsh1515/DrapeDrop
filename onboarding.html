@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Seller Onboarding - DrapeDrop</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .onboarding-page { background: #fff; min-height: 100vh; padding: 20px; }
+        .onboarding-container { max-width: 1100px; margin: 0 auto; }
+        .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .progress-card { background: #f8f9fa; border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+        .progress-row { display: flex; align-items: center; gap: 12px; }
+        .progress-bar { flex: 1; height: 10px; background: #e9ecef; border-radius: 999px; overflow: hidden; }
+        .progress-bar > span { display: block; height: 100%; background: linear-gradient(45deg,#667eea,#764ba2); width: 0%; transition: width .3s; }
+        .grid { display: grid; grid-template-columns: 1.1fr .9fr; gap: 16px; }
+        .card { background: #fff; border: 1px solid #eee; border-radius: 12px; padding: 16px; }
+        .section-title { display:flex; align-items:center; gap:8px; margin-bottom: 12px; }
+        .checkline { display:flex; align-items:center; gap:10px; margin: 8px 0; }
+        .checkline i { color: #667eea; }
+        .form-row { display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .form-group { margin-bottom: 12px; }
+        .form-group label { font-weight: 600; color:#333; display:block; margin-bottom: 6px; }
+        .form-group input, .form-group textarea { width:100%; padding: 10px 12px; border: 2px solid #e1e5e9; border-radius: 8px; font-size: 1rem; }
+        .doc-row { display:grid; grid-template-columns: 1fr auto auto; align-items:center; gap:12px; margin-bottom:10px; }
+        .doc-row .status { font-weight:600; font-size:.9rem; }
+        .actions { display:flex; gap:10px; margin-top: 12px; }
+        .right-sticky { position: sticky; top: 16px; }
+        .verified { color: #22c55e; }
+        .muted { color:#666; font-size:.9rem; }
+        .danger { color:#dc2626; }
+        .divider { height:1px; background:#eee; margin: 10px 0; }
+        /* Checklist styles */
+        .checklist { list-style: none; padding-left: 0; margin: 0; }
+        .checklist li { display: flex; align-items: flex-start; gap: 8px; margin: 6px 0; color: inherit; }
+        .checklist li i { color: #22c55e; margin-top: 2px; }
+        /* Pickup address styles */
+        .addr-row { display:grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+        .addr-tools { display:flex; gap: 8px; align-items:flex-end; }
+        .btn-icon { display:inline-flex; gap:8px; align-items:center; }
+        .addr-type { display:flex; gap:10px; margin-top:6px; }
+        .addr-btn { display:flex; align-items:center; gap:8px; padding:10px 14px; border:2px solid #e1e5e9; border-radius:10px; cursor:pointer; background:#fff; }
+        .addr-btn i { color:#667eea; }
+        .addr-btn.active { border-color:#667eea; background: #f3f4ff; }
+    </style>
+    <script defer src="onboarding.js"></script>
+</head>
+<body>
+    <div class="onboarding-page">
+        <div class="onboarding-container">
+            <div class="topbar">
+                <div class="section-title">
+                    <i class="fas fa-tshirt" style="color:#667eea"></i>
+                    <h2 style="margin:0">DrapeDrop Seller Onboarding</h2>
+                </div>
+                <button class="btn btn-danger" id="obLogout">Logout</button>
+            </div>
+
+            <div class="progress-card">
+                <div class="progress-row">
+                    <span>Your onboarding completion status:</span>
+                    <div class="progress-bar"><span id="obProgress"></span></div>
+                    <span id="obProgressText">0%</span>
+                </div>
+            </div>
+
+            <div class="grid">
+                <div class="card">
+                    <div class="section-title"><i class="fas fa-user-check"></i><h3 style="margin:0">Mobile & Email Verification</h3></div>
+                    <div class="checkline"><i class="fas fa-mobile"></i> Mobile verification <span class="verified" id="obMobileStatus">Verified</span></div>
+                    <div class="checkline"><i class="fas fa-envelope"></i> Email verification <span class="verified" id="obEmailStatus">Verified</span></div>
+                    <div class="divider"></div>
+                    <div class="section-title"><i class="fas fa-id-card"></i><h3 style="margin:0">ID No. Verification</h3></div>
+                    <div class="form-group"><label for="aadhaarNo">Aadhaar No.</label><input id="aadhaarNo" placeholder="0000 0000 0000"></div>
+                    <div class="form-group"><label for="secondIdType">Second ID Type</label>
+                        <select id="secondIdType">
+                            <option value="">Select ID type</option>
+                            <option value="pan">PAN No.</option>
+                            <option value="voter">Voter ID</option>
+                            <option value="dl">Driving Licence</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label for="secondId">Second ID Number</label><input id="secondId" placeholder="Enter selected ID number"></div>
+
+                    <div class="divider"></div>
+                    <div class="section-title"><i class="fas fa-file-upload"></i><h3 style="margin:0">Document Verification</h3></div>
+                    <div class="doc-row">
+                        <div>Aadhaar Card</div>
+                        <input type="file" id="docAadhaar" accept="image/*,application/pdf">
+                        <div class="status" id="docAadhaarStatus">Not uploaded</div>
+                    </div>
+                    <div class="doc-row">
+                        <div>PAN/Voter ID/Driving Licence</div>
+                        <input type="file" id="docSecond" accept="image/*,application/pdf">
+                        <div class="status" id="docSecondStatus">Not uploaded</div>
+                    </div>
+                    <div class="doc-row">
+                        <div>Signature</div>
+                        <input type="file" id="docSign" accept="image/*">
+                        <div class="status" id="docSignStatus">Not uploaded</div>
+                    </div>
+
+                    <div class="divider"></div>
+                    <div class="section-title"><i class="fas fa-store"></i><h3 style="margin:0">Store & Pickup Details</h3></div>
+                    <div class="form-group"><label for="displayName">Display Name</label><input id="displayName" placeholder="Your shop display name"></div>
+
+                    <div class="card" style="border:1px dashed #e5e7eb; margin-top: 6px;">
+                        <div class="section-title" style="margin-bottom:6px"><i class="fas fa-location-dot"></i><h3 style="margin:0">Pickup Address</h3></div>
+
+                        <div class="addr-row">
+                            <div class="form-group">
+                                <label for="addrPincode">Pincode (required)</label>
+                                <input id="addrPincode" placeholder="e.g. 560001">
+                            </div>
+                            <div class="form-group">
+                                <label for="addrState">State (required)</label>
+                                <input id="addrState" placeholder="e.g. Karnataka">
+                            </div>
+                        </div>
+
+                        <div class="addr-row">
+                            <div class="form-group">
+                                <label for="addrCity">City (required)</label>
+                                <input id="addrCity" placeholder="e.g. Bengaluru">
+                            </div>
+                            <div class="form-group addr-tools">
+                                <button type="button" class="btn btn-secondary btn-icon" id="addrUseLocation"><i class="fas fa-location-crosshairs"></i> Use my location</button>
+                            </div>
+                        </div>
+
+                        <div class="addr-row">
+                            <div class="form-group">
+                                <label for="addrHouse">House No. / Building Name (required)</label>
+                                <input id="addrHouse" placeholder="House no., building name">
+                            </div>
+                            <div class="form-group">
+                                <label for="addrRoad">Road name, Area, Colony (required)</label>
+                                <input id="addrRoad" placeholder="Road, area, colony">
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="addrLandmark">Add nearby famous shop/mall/landmark</label>
+                            <input id="addrLandmark" placeholder="Landmark (optional)">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Type of address</label>
+                            <div class="addr-type">
+                                <button type="button" class="addr-btn" id="addrTypeHome"><i class="fas fa-house"></i> Home</button>
+                                <button type="button" class="addr-btn" id="addrTypeWork"><i class="fas fa-briefcase"></i> Work</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="actions">
+                        <button class="btn btn-secondary" id="obSave">Save</button>
+                        <button class="btn btn-primary" id="obSubmit">Submit</button>
+                    </div>
+                    <p class="muted" style="margin-top:8px">Note: Submit will lock your details and continue to Seller Dashboard.</p>
+                </div>
+
+                <div class="card right-sticky">
+                    <div class="section-title"><i class="fas fa-user"></i><h3 style="margin:0">Seller</h3></div>
+                    <div id="sellerSummary" class="muted">Loading...</div>
+                    <div class="divider"></div>
+                    <div class="section-title"><i class="fas fa-circle-info"></i><h3 style="margin:0">Checklist</h3></div>
+                    <ul class="checklist">
+                        <li id="chkIds"><i class="fas fa-check"></i><span>Enter Aadhaar and one more ID</span></li>
+                        <li id="chkDocs"><i class="fas fa-check"></i><span>Upload Aadhaar, one more ID, and signature</span></li>
+                        <li id="chkStore"><i class="fas fa-check"></i><span>Provide display name and pickup address</span></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+

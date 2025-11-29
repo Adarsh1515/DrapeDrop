@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Account - DrapeDrop</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <div class="account-page">
+        <div class="account-card">
+            <div class="account-header">
+                <div class="account-user">
+                    <div class="avatar"><i class="fas fa-user"></i></div>
+                    <div class="user-text">
+                        <h2 id="userName">My Account</h2>
+                        <p id="userEmail"></p>
+                    </div>
+                </div>
+                <div class="account-actions">
+                    <button class="btn btn-secondary" id="backBtn"><i class="fas fa-arrow-left"></i> Back</button>
+                </div>
+            </div>
+
+            <div class="quick-actions">
+                <button class="action-card" id="ordersAction">
+                    <i class="fas fa-box"></i>
+                    <span>Orders</span>
+                </button>
+                <button class="action-card" id="wishlistAction">
+                    <i class="fas fa-heart"></i>
+                    <span>Wishlist</span>
+                </button>
+                <button class="action-card" id="requestsAction">
+                    <i class="fas fa-hand-holding-dollar"></i>
+                    <span>Requests to Buy</span>
+                </button>
+                <button class="action-card" id="helpAction">
+                    <i class="fas fa-circle-question"></i>
+                    <span>Help Center</span>
+                </button>
+            </div>
+
+            <div class="settings-section">
+                <h3>Account Settings</h3>
+                <ul class="settings-list">
+                    <li class="settings-item"><i class="fas fa-user-pen"></i><span>Edit Profile</span><i class="fas fa-chevron-right"></i></li>
+                    <li class="settings-item"><i class="fas fa-credit-card"></i><span>Saved Credit / Debit</span><i class="fas fa-chevron-right"></i></li>
+                    <li class="settings-item"><i class="fas fa-location-dot"></i><span>Saved Addresses</span><i class="fas fa-chevron-right"></i></li>
+                    <li class="settings-item"><i class="fas fa-language"></i><span>Select Language</span><i class="fas fa-chevron-right"></i></li>
+                    <li class="settings-item"><i class="fas fa-bell"></i><span>Notification Settings</span><i class="fas fa-chevron-right"></i></li>
+                    <li class="settings-item"><i class="fas fa-user-shield"></i><span>Privacy Center</span><i class="fas fa-chevron-right"></i></li>
+                </ul>
+            </div>
+
+            <div class="settings-section">
+                <h3>Feedback & Information</h3>
+                <ul class="settings-list">
+                    <li class="settings-item"><i class="fas fa-file-contract"></i><span>Terms, Policies & License</span><i class="fas fa-chevron-right"></i></li>
+                    <li class="settings-item"><i class="fas fa-question-circle"></i><span>Browse FAQs</span><i class="fas fa-chevron-right"></i></li>
+                </ul>
+            </div>
+
+            <div class="logout-row">
+                <button class="btn btn-danger" id="logoutBtn">Log Out</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="account.js"></script>
+</body>
+</html>
