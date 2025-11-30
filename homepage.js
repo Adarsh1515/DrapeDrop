@@ -108,6 +108,14 @@ function showUserDashboard() {
         ];
     }
 
+    // FORCE UPDATE: Ensure Summer Floral Dress (ID 2) has rent price of 1
+    const floralDressIndex = products.findIndex(p => p.id === 2);
+    if (floralDressIndex !== -1 && products[floralDressIndex].rentPrice !== 1) {
+        products[floralDressIndex].rentPrice = 1;
+        localStorage.setItem('drapedrop_products', JSON.stringify(products));
+        console.log('Updated Summer Floral Dress rent price to 1');
+    }
+
     const currentUser = JSON.parse(localStorage.getItem('drapedrop_currentUser'));
 
     // Only show approved products or items without a status (backward compatibility)
@@ -795,7 +803,7 @@ function addToCart(productId) {
                 condition: "Good",
                 originalPrice: 7499,
                 currentPrice: 3749,
-                rentPrice: 1199,
+                rentPrice: 1,
                 type: "rent",
                 image: "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=400&h=500&fit=crop",
                 description: "Light and comfortable summer dress with floral pattern. Perfect for outdoor events."
@@ -905,7 +913,7 @@ function rentNowDirect(productId) {
                 condition: "Good",
                 originalPrice: 7499,
                 currentPrice: 3749,
-                rentPrice: 1199,
+                rentPrice: 1,
                 type: "rent",
                 image: "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=400&h=500&fit=crop",
                 description: "Light and comfortable summer dress with floral pattern. Perfect for outdoor events."
@@ -984,7 +992,7 @@ function requestToBuy(productId) {
                 condition: "Good",
                 originalPrice: 7499,
                 currentPrice: 3749,
-                rentPrice: 1199,
+                rentPrice: 1,
                 type: "rent",
                 image: "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=400&h=500&fit=crop",
                 description: "Light and comfortable summer dress with floral pattern. Perfect for outdoor events."
@@ -1087,7 +1095,7 @@ function cleanupOldCartData() {
                     condition: "Good",
                     originalPrice: 7499,
                     currentPrice: 3749,
-                    rentPrice: 1199,
+                    rentPrice: 1,
                     type: "rent",
                     image: "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=400&h=500&fit=crop",
                     description: "Light and comfortable summer dress with floral pattern. Perfect for outdoor events."

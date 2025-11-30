@@ -718,6 +718,13 @@
             ];
         }
 
+        // FORCE UPDATE: Ensure Summer Floral Dress (ID 2) has rent price of 1
+        const floralDressIndex = products.findIndex(p => p.id === 2);
+        if (floralDressIndex !== -1 && products[floralDressIndex].rentPrice !== 1) {
+            products[floralDressIndex].rentPrice = 1;
+            localStorage.setItem('drapedrop_products', JSON.stringify(products));
+        }
+
         // Find the product
         const product = products.find(p => p.id === productId);
 

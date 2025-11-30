@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -12,7 +13,7 @@
             min-height: 100vh;
             padding: 20px;
         }
-        
+
         .back-button {
             background: linear-gradient(45deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -26,12 +27,12 @@
             align-items: center;
             gap: 8px;
         }
-        
+
         .back-button:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
         }
-        
+
         .product-details-container {
             max-width: 1200px;
             margin: 0 auto;
@@ -40,7 +41,7 @@
             gap: 50px;
             align-items: start;
         }
-        
+
         .product-image-section {
             background: #f8f9fa;
             border-radius: 15px;
@@ -85,15 +86,39 @@
             position: relative;
         }
 
-        .thumb img { width: 100%; height: 100%; object-fit: cover; }
-        .thumb span { position: absolute; bottom: 4px; left: 6px; right: 6px; font-size: 11px; color: #333; background: rgba(255,255,255,0.9); border-radius: 4px; padding: 2px 4px; text-align: center; }
-        .thumb.disabled { opacity: 0.4; cursor: default; }
-        .thumb.active { border-color: #667eea; box-shadow: 0 0 0 2px rgba(102,126,234,0.15) inset; }
-        
+        .thumb img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .thumb span {
+            position: absolute;
+            bottom: 4px;
+            left: 6px;
+            right: 6px;
+            font-size: 11px;
+            color: #333;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 4px;
+            padding: 2px 4px;
+            text-align: center;
+        }
+
+        .thumb.disabled {
+            opacity: 0.4;
+            cursor: default;
+        }
+
+        .thumb.active {
+            border-color: #667eea;
+            box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.15) inset;
+        }
+
         .product-info-section {
             padding: 20px;
         }
-        
+
         .product-detail-title {
             font-size: 2.5rem;
             color: #333;
@@ -101,16 +126,23 @@
             border-bottom: 3px solid #667eea;
             padding-bottom: 15px;
         }
-        
+
         .product-detail-grid {
             display: grid;
             gap: 20px;
             margin-bottom: 30px;
         }
 
-        .rating-row { display: flex; align-items: center; gap: 8px; }
-        .stars { color: #f5a623; }
-        
+        .rating-row {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .stars {
+            color: #f5a623;
+        }
+
         .detail-item {
             display: flex;
             justify-content: space-between;
@@ -118,80 +150,87 @@
             padding: 15px 0;
             border-bottom: 1px solid #eee;
         }
-        
+
         .detail-label {
             font-weight: 600;
             color: #666;
             font-size: 1.1rem;
             min-width: 150px;
         }
-        
+
         .detail-value {
             color: #333;
             font-weight: 500;
             font-size: 1.1rem;
         }
-        
+
         .price-highlight {
             color: #667eea;
             font-weight: 700;
             font-size: 1.3rem;
         }
-        
+
         .product-description {
             margin: 30px 0;
             padding: 20px;
             background: #f8f9fa;
             border-radius: 10px;
         }
-        
+
         .product-description h3 {
             color: #333;
             margin-bottom: 15px;
             font-size: 1.3rem;
         }
-        
+
         .product-description p {
             color: #666;
             line-height: 1.8;
             font-size: 1.1rem;
         }
-        
+
         .product-actions-detail {
             display: flex;
             gap: 20px;
             margin-top: 30px;
         }
-        
+
         .btn-large {
             padding: 15px 30px;
             font-size: 1.1rem;
         }
-        
+
         @media (max-width: 768px) {
             .product-details-container {
                 grid-template-columns: 1fr;
                 gap: 30px;
             }
-            .image-viewer { height: 360px; }
-            .thumbs-row { grid-template-columns: repeat(4, 1fr); }
-            
+
+            .image-viewer {
+                height: 360px;
+            }
+
+            .thumbs-row {
+                grid-template-columns: repeat(4, 1fr);
+            }
+
             .product-detail-title {
                 font-size: 2rem;
             }
-            
+
             .detail-item {
                 flex-direction: column;
                 align-items: flex-start;
                 gap: 8px;
             }
-            
+
             .product-actions-detail {
                 flex-direction: column;
             }
         }
     </style>
 </head>
+
 <body>
     <div class="product-details-page">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
@@ -201,7 +240,7 @@
             </button>
             <div id="userInfo" style="color: #667eea; font-weight: 600;"></div>
         </div>
-        
+
         <div class="product-details-container" id="productDetails">
             <!-- Product details will be loaded here -->
         </div>
@@ -211,7 +250,7 @@
         // Get product ID from URL parameters
         const urlParams = new URLSearchParams(window.location.search);
         const productId = parseInt(urlParams.get('id'));
-        
+
         // Load products from localStorage
         let products = [];
         const savedProducts = localStorage.getItem('drapedrop_products');
@@ -243,7 +282,7 @@
                     condition: "Good",
                     originalPrice: 7499,
                     currentPrice: 3749,
-                    rentPrice: 1199,
+                    rentPrice: 1,
                     type: "rent",
                     image: "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=400&h=500&fit=crop",
                     description: "Light and comfortable summer dress with floral pattern. Perfect for outdoor events."
@@ -264,13 +303,13 @@
                 }
             ];
         }
-        
+
         // Find the product
         const product = products.find(p => p.id === productId);
-        
+
         function loadProductDetails() {
             const container = document.getElementById('productDetails');
-            
+
             if (product) {
                 const images = product.images || {};
                 const primary = product.image || images.front || images.full || images.side || images.back || images.other || product.image;
@@ -278,15 +317,15 @@
                     <div class="product-image-section">
                         <div class="image-viewer" id="imageViewer"><img src="${primary}" alt="${product.name}"></div>
                         <div class="thumbs-row">
-                            ${['front','back','side','full','other'].map(key => {
-                                const label = key==='front'?'Front View':key==='back'?'Back View':key==='side'?'Side View':key==='full'?'Full View':'Other';
-                                const src = images[key];
-                                if (!src) {
-                                    return `<div class=\"thumb disabled\"><span>${label}</span></div>`;
-                                }
-                                const active = src===primary ? 'active' : '';
-                                return `<div class=\"thumb ${active}\" onclick=\"setMainImage('${key}')\"><img src=\"${src}\" alt=\"${label}\"><span>${label}</span></div>`;
-                            }).join('')}
+                            ${['front', 'back', 'side', 'full', 'other'].map(key => {
+                    const label = key === 'front' ? 'Front View' : key === 'back' ? 'Back View' : key === 'side' ? 'Side View' : key === 'full' ? 'Full View' : 'Other';
+                    const src = images[key];
+                    if (!src) {
+                        return `<div class=\"thumb disabled\"><span>${label}</span></div>`;
+                    }
+                    const active = src === primary ? 'active' : '';
+                    return `<div class=\"thumb ${active}\" onclick=\"setMainImage('${key}')\"><img src=\"${src}\" alt=\"${label}\"><span>${label}</span></div>`;
+                }).join('')}
                         </div>
                         <div class="product-description">
                             <h3>Description</h3>
@@ -331,10 +370,10 @@
                             <div class="detail-item">
                                 <span class="detail-label">${product.type === 'sale' ? 'Sale Price:' : 'Rent Price:'}</span>
                                 <span class="detail-value price-highlight">
-                                    ${product.type === 'sale' ? 
-                                        `₹${product.currentPrice.toLocaleString('en-IN')}` : 
-                                        `₹${product.rentPrice.toLocaleString('en-IN')}/day`
-                                    }
+                                    ${product.type === 'sale' ?
+                        `₹${product.currentPrice.toLocaleString('en-IN')}` :
+                        `₹${product.rentPrice.toLocaleString('en-IN')}/day`
+                    }
                                 </span>
                             </div>
                         </div>
@@ -360,11 +399,11 @@
                 `;
             }
         }
-        
+
         function goBack() {
             // Check if user is logged in by looking for user data in localStorage
             const currentUser = localStorage.getItem('drapedrop_currentUser');
-            
+
             if (currentUser) {
                 // User is logged in, redirect to index.html which will show the dashboard
                 window.location.href = 'index.html';
@@ -373,7 +412,7 @@
                 window.location.href = 'index.html';
             }
         }
-        
+
         function setMainImage(slotKey) {
             const images = (product && product.images) || {};
             const src = images[slotKey];
@@ -397,31 +436,31 @@
         function addToCart(productId) {
             // Check if user is logged in
             const currentUser = localStorage.getItem('drapedrop_currentUser');
-            
+
             if (!currentUser) {
                 alert('Please log in to add items to cart!');
                 window.location.href = 'index.html';
                 return;
             }
-            
+
             // Get existing cart from localStorage
             let cart = JSON.parse(localStorage.getItem('drapedrop_cart') || '[]');
-            
+
             // Add product to cart
             const productToAdd = products.find(p => p.id === productId);
             if (productToAdd) {
                 cart.push(productToAdd);
                 localStorage.setItem('drapedrop_cart', JSON.stringify(cart));
-                
+
                 // Show success message
                 alert(`${productToAdd.name} added to cart successfully!`);
             }
         }
-        
+
         function displayUserInfo() {
             const userInfo = document.getElementById('userInfo');
             const currentUser = localStorage.getItem('drapedrop_currentUser');
-            
+
             if (currentUser) {
                 const user = JSON.parse(currentUser);
                 userInfo.innerHTML = `Welcome, ${user.name}!`;
@@ -429,12 +468,13 @@
                 userInfo.innerHTML = '';
             }
         }
-        
+
         // Load product details when page loads
-        window.onload = function() {
+        window.onload = function () {
             loadProductDetails();
             displayUserInfo();
         };
     </script>
 </body>
-</html> 
+
+</html>

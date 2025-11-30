@@ -41,9 +41,9 @@ function initializeProducts() {
                 color: "Black",
                 size: "M",
                 condition: "Excellent",
-                        originalPrice: 24999,
-        currentPrice: 12499,
-        rentPrice: 1999,
+                originalPrice: 24999,
+                currentPrice: 12499,
+                rentPrice: 1999,
                 type: "sale", // sale or rent
                 image: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=400&h=500&fit=crop",
                 description: "Beautiful black evening dress perfect for special occasions. Worn only twice, excellent condition."
@@ -55,9 +55,9 @@ function initializeProducts() {
                 color: "Blue",
                 size: "S",
                 condition: "Good",
-                        originalPrice: 7499,
-        currentPrice: 3749,
-        rentPrice: 1199,
+                originalPrice: 7499,
+                currentPrice: 3749,
+                rentPrice: 1,
                 type: "rent",
                 image: "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=400&h=500&fit=crop",
                 description: "Light and comfortable summer dress with floral pattern. Perfect for outdoor events."
@@ -69,9 +69,9 @@ function initializeProducts() {
                 color: "Red",
                 size: "L",
                 condition: "Very Good",
-                        originalPrice: 16699,
-        currentPrice: 8349,
-        rentPrice: 1599,
+                originalPrice: 16699,
+                currentPrice: 8349,
+                rentPrice: 1599,
                 type: "sale",
                 image: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=400&h=500&fit=crop",
                 description: "Stunning red cocktail dress for parties and events. Great condition with minor wear."
@@ -95,7 +95,7 @@ function checkLoggedInUser() {
     if (savedUser) {
         currentUser = JSON.parse(savedUser);
         currentUserType = currentUser.type;
-        
+
         // Show appropriate dashboard
         if (currentUserType === 'user') {
             showUserDashboard();
@@ -138,7 +138,7 @@ function viewProduct(productId) {
     console.log('viewProduct called with ID:', productId); // Debug log
     const product = products.find(p => p.id === productId);
     console.log('Found product:', product); // Debug log
-    
+
     if (product) {
         const modalHTML = `
             <div class="modal product-details-modal">
@@ -178,10 +178,10 @@ function viewProduct(productId) {
                                 <div class="detail-item">
                                     <span class="detail-label">${product.type === 'sale' ? 'Sale Price:' : 'Rent Price:'}</span>
                                     <span class="detail-value price-highlight">
-                                        ${product.type === 'sale' ? 
-                                            `₹${product.currentPrice.toLocaleString('en-IN')}` : 
-                                            `₹${product.rentPrice.toLocaleString('en-IN')}/day`
-                                        }
+                                        ${product.type === 'sale' ?
+                `₹${product.currentPrice.toLocaleString('en-IN')}` :
+                `₹${product.rentPrice.toLocaleString('en-IN')}/day`
+            }
                                     </span>
                                 </div>
                             </div>
@@ -204,7 +204,7 @@ function viewProduct(productId) {
                 </div>
             </div>
         `;
-        
+
         document.body.insertAdjacentHTML('beforeend', modalHTML);
         console.log('Modal HTML added to page'); // Debug log
     } else {
@@ -266,89 +266,89 @@ function rentNowDirect(productId) {
 }
 
 function requestToBuy(productId) {
-	const currentUser = JSON.parse(localStorage.getItem('drapedrop_currentUser') || 'null');
-	if (!currentUser) { alert('Please login first.'); return; }
+    const currentUser = JSON.parse(localStorage.getItem('drapedrop_currentUser') || 'null');
+    if (!currentUser) { alert('Please login first.'); return; }
 
-	// Ensure products are available, fallback to defaults and persist if missing
-	let products = [];
-	const savedProducts = localStorage.getItem('drapedrop_products');
-	if (savedProducts) {
-		products = JSON.parse(savedProducts);
-	} else {
-		products = [
-			{
-				id: 1,
-				name: "Elegant Black Evening Dress",
-				brand: "Fashion House",
-				color: "Black",
-				size: "M",
-				condition: "Excellent",
-				originalPrice: 24999,
-				currentPrice: 12499,
-				rentPrice: 1999,
-				type: "sale",
-				image: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=400&h=500&fit=crop",
-				description: "Beautiful black evening dress perfect for special occasions. Worn only twice, excellent condition."
-			},
-			{
-				id: 2,
-				name: "Summer Floral Dress",
-				brand: "Spring Collection",
-				color: "Blue",
-				size: "S",
-				condition: "Good",
-				originalPrice: 7499,
-				currentPrice: 3749,
-				rentPrice: 1199,
-				type: "rent",
-				image: "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=400&h=500&fit=crop",
-				description: "Light and comfortable summer dress with floral pattern. Perfect for outdoor events."
-			},
-			{
-				id: 3,
-				name: "Red Cocktail Dress",
-				brand: "Elegance",
-				color: "Red",
-				size: "L",
-				condition: "Very Good",
-				originalPrice: 16699,
-				currentPrice: 8349,
-				rentPrice: 1599,
-				type: "sale",
-				image: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=400&h=500&fit=crop",
-				description: "Stunning red cocktail dress for parties and events. Great condition with minor wear."
-			}
-		];
-		localStorage.setItem('drapedrop_products', JSON.stringify(products));
-	}
+    // Ensure products are available, fallback to defaults and persist if missing
+    let products = [];
+    const savedProducts = localStorage.getItem('drapedrop_products');
+    if (savedProducts) {
+        products = JSON.parse(savedProducts);
+    } else {
+        products = [
+            {
+                id: 1,
+                name: "Elegant Black Evening Dress",
+                brand: "Fashion House",
+                color: "Black",
+                size: "M",
+                condition: "Excellent",
+                originalPrice: 24999,
+                currentPrice: 12499,
+                rentPrice: 1999,
+                type: "sale",
+                image: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=400&h=500&fit=crop",
+                description: "Beautiful black evening dress perfect for special occasions. Worn only twice, excellent condition."
+            },
+            {
+                id: 2,
+                name: "Summer Floral Dress",
+                brand: "Spring Collection",
+                color: "Blue",
+                size: "S",
+                condition: "Good",
+                originalPrice: 7499,
+                currentPrice: 3749,
+                rentPrice: 1,
+                type: "rent",
+                image: "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=400&h=500&fit=crop",
+                description: "Light and comfortable summer dress with floral pattern. Perfect for outdoor events."
+            },
+            {
+                id: 3,
+                name: "Red Cocktail Dress",
+                brand: "Elegance",
+                color: "Red",
+                size: "L",
+                condition: "Very Good",
+                originalPrice: 16699,
+                currentPrice: 8349,
+                rentPrice: 1599,
+                type: "sale",
+                image: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=400&h=500&fit=crop",
+                description: "Stunning red cocktail dress for parties and events. Great condition with minor wear."
+            }
+        ];
+        localStorage.setItem('drapedrop_products', JSON.stringify(products));
+    }
 
-	const product = products.find(p => p.id === productId);
-	if (!product) { alert('Product not found'); return; }
+    const product = products.find(p => p.id === productId);
+    if (!product) { alert('Product not found'); return; }
 
-	const requests = JSON.parse(localStorage.getItem('drapedrop_buyRequests') || '[]');
-	const request = {
-		id: Date.now(),
-		productId: product.id,
-		userEmail: currentUser.email,
-		userName: [currentUser.firstName, currentUser.lastName].filter(Boolean).join(' '),
-		status: 'pending',
-		createdAt: new Date().toISOString(),
-		product: {
-			id: product.id,
-			name: product.name,
-			brand: product.brand,
-			color: product.color,
-			size: product.size,
-			currentPrice: product.currentPrice,
-			rentPrice: product.rentPrice,
-			type: product.type,
-			image: product.image
-		}
-	};
-	requests.push(request);
-	localStorage.setItem('drapedrop_buyRequests', JSON.stringify(requests));
-	closeSlidingWindow();
-	window.location.href = 'requests.html';
+    const requests = JSON.parse(localStorage.getItem('drapedrop_buyRequests') || '[]');
+    const request = {
+        id: Date.now(),
+        productId: product.id,
+        userEmail: currentUser.email,
+        userName: [currentUser.firstName, currentUser.lastName].filter(Boolean).join(' '),
+        status: 'pending',
+        createdAt: new Date().toISOString(),
+        product: {
+            id: product.id,
+            name: product.name,
+            brand: product.brand,
+            color: product.color,
+            size: product.size,
+            currentPrice: product.currentPrice,
+            rentPrice: product.rentPrice,
+            type: product.type,
+            image: product.image
+        }
+    };
+    requests.push(request);
+    localStorage.setItem('drapedrop_buyRequests', JSON.stringify(requests));
+    closeSlidingWindow();
+    window.location.href = 'requests.html';
 }
 
 function proceedToRent(productId) {
@@ -397,11 +397,11 @@ function showRegisterForm() {
     const title = document.getElementById('loginTitle');
     const submitBtn = form.querySelector('button[type="submit"]');
     const registerLink = document.querySelector('.register-link');
-    
+
     title.textContent = 'Register';
     submitBtn.textContent = 'Register';
     registerLink.innerHTML = 'Already have an account? <a href="#" onclick="showLoginForm()">Login here</a>';
-    
+
     // Add name field for registration
     if (!document.getElementById('name')) {
         const nameGroup = document.createElement('div');
@@ -419,11 +419,11 @@ function showLoginForm() {
     const title = document.getElementById('loginTitle');
     const submitBtn = form.querySelector('button[type="submit"]');
     const registerLink = document.querySelector('.register-link');
-    
+
     title.textContent = 'Login';
     submitBtn.textContent = 'Login';
     registerLink.innerHTML = 'Don\'t have an account? <a href="#" onclick="showRegisterForm()">Register here</a>';
-    
+
     // Remove name field for login
     const nameField = document.getElementById('name');
     if (nameField) {
@@ -432,13 +432,13 @@ function showLoginForm() {
 }
 
 // Handle form submission
-document.getElementById('authForm').addEventListener('submit', function(e) {
+document.getElementById('authForm').addEventListener('submit', function (e) {
     e.preventDefault();
-    
+
     const email = document.getElementById('email').value;
     const password = document.getElementById('password').value;
     const nameField = document.getElementById('name');
-    
+
     if (nameField) {
         // Registration
         const name = nameField.value;
@@ -457,10 +457,10 @@ document.getElementById('authForm').addEventListener('submit', function(e) {
         // Login
         if (email && password) {
             // Simple authentication - in real app, this would validate against backend
-            currentUser = { 
-                name: email.split('@')[0], 
-                email, 
-                type: currentUserType 
+            currentUser = {
+                name: email.split('@')[0],
+                email,
+                type: currentUserType
             };
             // Save user to localStorage
             localStorage.setItem('drapedrop_currentUser', JSON.stringify(currentUser));
@@ -481,7 +481,7 @@ function showUserDashboard() {
     if (savedProducts) {
         products = JSON.parse(savedProducts);
     }
-    
+
     // Only show approved (or legacy without status)
     const visibleProducts = products.filter(p => !p.status || p.status === 'approved');
 
@@ -519,26 +519,26 @@ function showUserDashboard() {
                                 Original Price: ₹${product.originalPrice.toLocaleString('en-IN')}
                             </p>
                             <div class="product-price">
-                                ${product.type === 'sale' ? 
-                                    `Sale Price: ₹${product.currentPrice.toLocaleString('en-IN')}` : 
-                                    `Rent Price: ₹${product.rentPrice.toLocaleString('en-IN')}/day`
-                                }
+                                ${product.type === 'sale' ?
+            `Sale Price: ₹${product.currentPrice.toLocaleString('en-IN')}` :
+            `Rent Price: ₹${product.rentPrice.toLocaleString('en-IN')}/day`
+        }
                             </div>
                             <div class="product-actions">
                                 <button class="btn btn-primary btn-small" onclick="addToCart(${product.id})">
                                     <i class="fas fa-cart-plus"></i>
                                     Add to Cart
                                 </button>
-                                ${product.type === 'sale' ? 
-                                    `<button class="btn btn-success btn-small" onclick="buyNowDirect(${product.id})">
+                                ${product.type === 'sale' ?
+            `<button class="btn btn-success btn-small" onclick="buyNowDirect(${product.id})">
                                         <i class="fas fa-credit-card"></i>
                                         Buy Now
-                                    </button>` : 
-                                    `<button class="btn btn-warning btn-small" onclick="rentNowDirect(${product.id})">
+                                    </button>` :
+            `<button class="btn btn-warning btn-small" onclick="rentNowDirect(${product.id})">
                                         <i class="fas fa-calendar-alt"></i>
                                         Rent Now
                                     </button>`
-                                }
+        }
                             </div>
                         </div>
                     </div>
@@ -546,7 +546,7 @@ function showUserDashboard() {
             </div>
         </div>
     `;
-    
+
     // Update cart count display after dashboard loads
     updateCartCountDisplay();
 }
@@ -558,7 +558,7 @@ function showAdminDashboard() {
     if (savedProducts) {
         products = JSON.parse(savedProducts);
     }
-    
+
     document.body.innerHTML = `
         <div class="admin-dashboard">
             <div class="admin-header">
@@ -588,10 +588,10 @@ function showAdminDashboard() {
                                     Type: ${product.type.charAt(0).toUpperCase() + product.type.slice(1)}
                                 </p>
                                                         <div class="product-price">
-                            ${product.type === 'sale' ? 
-                                `Sale Price: ₹${product.currentPrice.toLocaleString('en-IN')}` : 
-                                `Rent Price: ₹${product.rentPrice.toLocaleString('en-IN')}/day`
-                            }
+                            ${product.type === 'sale' ?
+            `Sale Price: ₹${product.currentPrice.toLocaleString('en-IN')}` :
+            `Rent Price: ₹${product.rentPrice.toLocaleString('en-IN')}/day`
+        }
                         </div>
                                 <div class="product-actions">
                                     <button class="btn btn-primary btn-small" onclick="editProduct(${product.id})">
@@ -758,7 +758,7 @@ function showAdminDashboard() {
             </div>
         </div>
     `;
-    
+
     // Add event listener for form submission
     document.getElementById('addProductForm').addEventListener('submit', addNewProduct);
     // Initialize image slot interactions
@@ -770,14 +770,14 @@ function showTab(tabName) {
     // Hide all tabs
     document.getElementById('products-tab').style.display = 'none';
     document.getElementById('add-product-tab').style.display = 'none';
-    
+
     // Show selected tab
     document.getElementById(tabName + '-tab').style.display = 'block';
-    
+
     // Update active tab button
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
     event.target.classList.add('active');
-    
+
     // If switching to products tab, refresh the products display
     if (tabName === 'products') {
         refreshProductsDisplay();
@@ -792,10 +792,10 @@ function addToCart(productId) {
         let cart = JSON.parse(localStorage.getItem('drapedrop_cart') || '[]');
         cart.push(product);
         localStorage.setItem('drapedrop_cart', JSON.stringify(cart));
-        
+
         // Update cart count in the UI
         updateCartCountDisplay();
-        
+
         showNotification('Product added to cart!');
     }
 }
@@ -814,7 +814,7 @@ function updateCartCountDisplay() {
 // Admin functions
 function addNewProduct(e) {
     e.preventDefault();
-    
+
     const sellingPriceVal = document.getElementById('currentPrice').value;
     const parsedSellingPrice = sellingPriceVal === '' ? null : parseFloat(sellingPriceVal);
     const rentBase = parsedSellingPrice != null ? parsedSellingPrice : parseFloat(document.getElementById('originalPrice').value || '0');
@@ -840,20 +840,20 @@ function addNewProduct(e) {
         status: 'approved',
         addedDate: new Date().toISOString()
     };
-    
+
     products.push(newProduct);
     saveProducts(); // Save to localStorage
-    
+
     // Show success notification with product details
     showNotification(`Product "${newProduct.name}" added successfully! It's now available for users.`);
-    
+
     // Clear the form
     document.getElementById('addProductForm').reset();
     resetImageSlots();
-    
+
     // Switch to products tab to show the new product
     showTab('products');
-    
+
     // Highlight the newly added product
     setTimeout(() => {
         highlightNewProduct(newProduct.id);
@@ -871,7 +871,7 @@ function setupImageSlots() {
     window.deleteSelectedSlot = deleteSelectedSlot;
 
     // Initial render for all slots and counter
-    ['front','back','side','full','other'].forEach(renderSlot);
+    ['front', 'back', 'side', 'full', 'other'].forEach(renderSlot);
     updateImageCounter();
     renderViewPanel();
 }
@@ -880,7 +880,7 @@ function onSlotInputChange(event, slotKey) {
     const file = event.target.files && event.target.files[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = function(e) {
+    reader.onload = function (e) {
         newProductImages[slotKey] = e.target.result;
         renderSlot(slotKey);
         updateImageCounter();
@@ -904,7 +904,7 @@ function clearSlot(slotKey, evt) {
     updateImageCounter();
     if (selectedImageSlot === slotKey) {
         // pick another image if available
-        const next = ['front','full','side','back','other'].find(k => newProductImages[k]);
+        const next = ['front', 'full', 'side', 'back', 'other'].find(k => newProductImages[k]);
         selectedImageSlot = next || null;
         renderViewPanel();
     }
@@ -1031,7 +1031,7 @@ function previewImage(input) {
     const preview = document.getElementById('imagePreview');
     if (input.files && input.files[0]) {
         const reader = new FileReader();
-        reader.onload = function(e) {
+        reader.onload = function (e) {
             preview.innerHTML = `<img src="${e.target.result}" style="max-width: 200px; max-height: 200px; margin-top: 10px;">`;
         };
         reader.readAsDataURL(input.files[0]);
@@ -1055,10 +1055,10 @@ function refreshProductsDisplay() {
                             Type: ${product.type.charAt(0).toUpperCase() + product.type.slice(1)}
                         </p>
                         <div class="product-price">
-                            ${product.type === 'sale' ? 
-                                `Sale Price: ₹${product.currentPrice.toLocaleString('en-IN')}` : 
-                                `Rent Price: ₹${product.rentPrice.toLocaleString('en-IN')}/day`
-                            }
+                            ${product.type === 'sale' ?
+                    `Sale Price: ₹${product.currentPrice.toLocaleString('en-IN')}` :
+                    `Rent Price: ₹${product.rentPrice.toLocaleString('en-IN')}/day`
+                }
                         </div>
                         <div class="product-actions">
                             <button class="btn btn-primary btn-small" onclick="editProduct(${product.id})">
@@ -1102,7 +1102,7 @@ function showNotification(message) {
     `;
     notification.textContent = message;
     document.body.appendChild(notification);
-    
+
     setTimeout(() => {
         notification.remove();
     }, 3000);
@@ -1120,21 +1120,21 @@ function logout() {
 }
 
 // Close modal when clicking outside
-window.onclick = function(event) {
+window.onclick = function (event) {
     const loginModal = document.getElementById('loginModal');
     const productModal = document.querySelector('.product-details-modal');
-    
+
     if (event.target === loginModal) {
         closeModal();
     }
-    
+
     if (event.target === productModal) {
         closeProductModal();
     }
 }
 
 // Check for logged in user when page loads
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     // Only check for logged in user if we're on the main page and not trying to access auth
     // Temporarily disabled to prevent conflicts with login navigation
     // if (window.location.pathname.includes('index.html') || window.location.pathname === '/') {
