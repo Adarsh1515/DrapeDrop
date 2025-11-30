@@ -19,12 +19,12 @@ let newProductImages = { front: null, back: null, side: null, full: null, other:
 let selectedImageSlot = null;
 
 // Check if user is already logged in when page loads
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     const savedUser = localStorage.getItem('drapedrop_currentUser');
     if (savedUser) {
         const currentUser = JSON.parse(savedUser);
         const currentUserType = currentUser.type;
-        
+
         // Show appropriate dashboard
         if (currentUserType === 'user') {
             showUserDashboard();
@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function() {
             showAdminDashboard();
         }
     }
-    
+
     // Clean up old cart data (convert IDs to full product objects)
     cleanupOldCartData();
 });
@@ -86,7 +86,7 @@ function showUserDashboard() {
                 condition: "Good",
                 originalPrice: 7499,
                 currentPrice: 3749,
-                rentPrice: 1199,
+                rentPrice: 1,
                 type: "rent",
                 image: "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=400&h=500&fit=crop",
                 description: "Light and comfortable summer dress with floral pattern. Perfect for outdoor events."
@@ -107,9 +107,9 @@ function showUserDashboard() {
             }
         ];
     }
-    
+
     const currentUser = JSON.parse(localStorage.getItem('drapedrop_currentUser'));
-    
+
     // Only show approved products or items without a status (backward compatibility)
     const visibleProducts = products.filter(p => !p.status || p.status === 'approved');
 
@@ -151,10 +151,10 @@ function showUserDashboard() {
                                 Original Price: ₹${product.originalPrice.toLocaleString('en-IN')}
                             </p>
                             <div class="product-price">
-                                ${product.type === 'sale' ? 
-                                    `Sale Price: ₹${product.currentPrice.toLocaleString('en-IN')}` : 
-                                    `Rent Price: ₹${product.rentPrice.toLocaleString('en-IN')}/day`
-                                }
+                                ${product.type === 'sale' ?
+            `Sale Price: ₹${product.currentPrice.toLocaleString('en-IN')}` :
+            `Rent Price: ₹${product.rentPrice.toLocaleString('en-IN')}/day`
+        }
                             </div>
                             <div class="product-actions">
                                 <button class="btn btn-primary btn-small" onclick="addToCart(${product.id})">
@@ -172,7 +172,7 @@ function showUserDashboard() {
             </div>
         </div>
     `;
-    
+
     // Update cart count display after dashboard loads
     updateCartCountDisplay();
 }
@@ -212,7 +212,7 @@ function showAdminDashboard() {
                 condition: "Good",
                 originalPrice: 7499,
                 currentPrice: 3749,
-                rentPrice: 1199,
+                rentPrice: 1,
                 type: "rent",
                 image: "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=400&h=500&fit=crop",
                 description: "Light and comfortable summer dress with floral pattern. Perfect for outdoor events.",
@@ -242,7 +242,7 @@ function showAdminDashboard() {
     const pendingBuyRequests = buyRequests.filter(r => r.status === 'pending');
 
     const currentUser = JSON.parse(localStorage.getItem('drapedrop_currentUser'));
-    
+
     document.body.innerHTML = `
         <div class="dashboard">
             <div class="dashboard-header">
@@ -273,10 +273,10 @@ function showAdminDashboard() {
                                 <p>Brand: ${product.brand} | Color: ${product.color} | Size: ${product.size}</p>
                                 <p>Condition: ${product.condition}</p>
                                 <p>Original Price: ₹${product.originalPrice.toLocaleString('en-IN')}</p>
-                                <p>${product.type === 'sale' ? 
-                                    `Sale Price: ₹${product.currentPrice.toLocaleString('en-IN')}` : 
-                                    `Rent Price: ₹${product.rentPrice.toLocaleString('en-IN')}/day`
-                                }</p>
+                                <p>${product.type === 'sale' ?
+            `Sale Price: ₹${product.currentPrice.toLocaleString('en-IN')}` :
+            `Rent Price: ₹${product.rentPrice.toLocaleString('en-IN')}/day`
+        }</p>
                                 <p class="product-date">Added: ${new Date(product.addedDate).toLocaleDateString()}</p>
                                 <div class="product-actions">
                                     <button class="btn btn-secondary" onclick="editProduct(${product.id})">Edit</button>
@@ -302,10 +302,10 @@ function showAdminDashboard() {
                                 <p>Brand: ${product.brand} | Color: ${product.color} | Size: ${product.size}</p>
                                 <p>Condition: ${product.condition}</p>
                                 <p>Original Price: ₹${product.originalPrice.toLocaleString('en-IN')}</p>
-                                <p>${product.type === 'sale' ? 
-                                    `Sale Price: ₹${product.currentPrice.toLocaleString('en-IN')}` : 
-                                    `Rent Price: ₹${product.rentPrice.toLocaleString('en-IN')}/day`
-                                }</p>
+                                <p>${product.type === 'sale' ?
+                `Sale Price: ₹${product.currentPrice.toLocaleString('en-IN')}` :
+                `Rent Price: ₹${product.rentPrice.toLocaleString('en-IN')}/day`
+            }</p>
                                 <p class="product-date">Added: ${new Date(product.addedDate).toLocaleDateString()}</p>
                                 <div class="product-actions">
                                     <button class="btn btn-success" onclick="approveProduct(${product.id})">Approve</button>
@@ -531,22 +531,22 @@ function logout() {
 
 function showTab(tabName) {
     console.log('Switching to tab:', tabName);
-    
+
     // Hide all tabs
     document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
     document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-    
+
     // Show selected tab
     const targetTab = document.getElementById(tabName + 'Tab');
     if (targetTab) {
         targetTab.classList.add('active');
     }
-    
+
     // Update button styling
     if (event && event.target) {
         event.target.classList.add('active');
     }
-    
+
     // If switching to products tab, just switch without refreshing
     if (tabName === 'products') {
         console.log('Switching to products tab');
@@ -564,41 +564,41 @@ function addNewProduct(e) {
         showNotification('Please upload at least one product image.');
         return;
     }
-    
+
     const images = { ...newProductImages };
     const primaryImage = images.front || images.full || images.side || images.back || images.other;
 
-        const newProduct = {
-            id: Date.now(),
-            name: document.getElementById('productName').value,
-            brand: document.getElementById('brand').value,
-            color: document.getElementById('color').value,
-            size: document.getElementById('size').value,
-            condition: document.getElementById('condition').value,
-            originalPrice: parseInt(document.getElementById('originalPrice').value),
-            currentPrice: parsedSellingPrice,
-            rentPrice: parseInt(document.getElementById('rentPrice').value),
-            type: document.getElementById('productType').value,
-            description: document.getElementById('description').value,
+    const newProduct = {
+        id: Date.now(),
+        name: document.getElementById('productName').value,
+        brand: document.getElementById('brand').value,
+        color: document.getElementById('color').value,
+        size: document.getElementById('size').value,
+        condition: document.getElementById('condition').value,
+        originalPrice: parseInt(document.getElementById('originalPrice').value),
+        currentPrice: parsedSellingPrice,
+        rentPrice: parseInt(document.getElementById('rentPrice').value),
+        type: document.getElementById('productType').value,
+        description: document.getElementById('description').value,
         image: primaryImage,
         images,
         status: "approved",
-            addedDate: new Date().toISOString()
-        };
-        
-        // Load existing products
-        let products = [];
-        const savedProducts = localStorage.getItem('drapedrop_products');
-        if (savedProducts) {
-            products = JSON.parse(savedProducts);
-        }
-        products.push(newProduct);
-        localStorage.setItem('drapedrop_products', JSON.stringify(products));
-        
-        showConfirmationModal(newProduct);
-        
+        addedDate: new Date().toISOString()
+    };
+
+    // Load existing products
+    let products = [];
+    const savedProducts = localStorage.getItem('drapedrop_products');
+    if (savedProducts) {
+        products = JSON.parse(savedProducts);
+    }
+    products.push(newProduct);
+    localStorage.setItem('drapedrop_products', JSON.stringify(products));
+
+    showConfirmationModal(newProduct);
+
     // Clear form and reset image slots
-        e.target.reset();
+    e.target.reset();
     resetImageSlots();
 }
 
@@ -613,15 +613,15 @@ function showConfirmationModal(product) {
     const details = document.getElementById('confirmationDetails');
     const price = document.getElementById('confirmationPrice');
     const status = document.getElementById('confirmationStatus');
-    
+
     image.src = product.image;
     name.textContent = product.name;
     details.textContent = `${product.brand} | ${product.color} | Size: ${product.size} | Condition: ${product.condition}`;
-    price.textContent = product.type === 'sale' ? 
-        `Sale Price: ₹${product.currentPrice.toLocaleString('en-IN')}` : 
+    price.textContent = product.type === 'sale' ?
+        `Sale Price: ₹${product.currentPrice.toLocaleString('en-IN')}` :
         `Rent Price: ₹${product.rentPrice.toLocaleString('en-IN')}/day`;
     status.textContent = `Status: ${product.status === 'pending' ? 'Pending Approval' : 'Approved'}`;
-    
+
     modal.style.display = 'block';
 }
 
@@ -639,7 +639,7 @@ function approveProduct(productId) {
     if (confirm('Are you sure you want to approve this product?')) {
         let products = JSON.parse(localStorage.getItem('drapedrop_products'));
         const productIndex = products.findIndex(p => p.id === productId);
-        
+
         if (productIndex !== -1) {
             products[productIndex].status = 'approved';
             localStorage.setItem('drapedrop_products', JSON.stringify(products));
@@ -653,7 +653,7 @@ function rejectProduct(productId) {
     if (confirm('Are you sure you want to reject this product?')) {
         let products = JSON.parse(localStorage.getItem('drapedrop_products'));
         const productIndex = products.findIndex(p => p.id === productId);
-        
+
         if (productIndex !== -1) {
             products[productIndex].status = 'rejected';
             localStorage.setItem('drapedrop_products', JSON.stringify(products));
@@ -725,24 +725,24 @@ function deleteProduct(productId) {
     if (confirm('Are you sure you want to delete this product?')) {
         // Find the product card element
         const productCard = document.querySelector(`[onclick="deleteProduct(${productId})"]`).closest('.product-card');
-        
+
         if (productCard) {
             // Animate the deletion
             productCard.classList.add('deleting');
-            
+
             setTimeout(() => {
                 productCard.remove();
                 showNotification('Product deleted successfully!');
             }, 300);
         }
-        
+
         // Update localStorage
         let products = [];
         const savedProducts = localStorage.getItem('drapedrop_products');
         if (savedProducts) {
             products = JSON.parse(savedProducts);
         }
-        
+
         products = products.filter(p => p.id !== productId);
         localStorage.setItem('drapedrop_products', JSON.stringify(products));
     }
@@ -763,7 +763,7 @@ function addToCart(productId) {
     if (savedCart) {
         cart = JSON.parse(savedCart);
     }
-    
+
     // Find the product details
     let products = [];
     const savedProducts = localStorage.getItem('drapedrop_products');
@@ -816,18 +816,18 @@ function addToCart(productId) {
             }
         ];
     }
-    
+
     // Find the product by ID
     const product = products.find(p => p.id === productId);
-    
+
     if (product) {
         // Add complete product details to cart
         cart.push(product);
         localStorage.setItem('drapedrop_cart', JSON.stringify(cart));
-        
+
         // Update cart count display
         updateCartCountDisplay();
-        
+
         // Show success notification
         showNotification('Product added to cart successfully!');
     } else {
@@ -860,10 +860,10 @@ function showNotification(message) {
         animation: slideIn 0.3s ease;
     `;
     notification.textContent = message;
-    
+
     // Add to page
     document.body.appendChild(notification);
-    
+
     // Remove after 3 seconds
     setTimeout(() => {
         notification.remove();
@@ -951,89 +951,89 @@ function rentNowDirect(productId) {
 }
 
 function requestToBuy(productId) {
-	const currentUser = JSON.parse(localStorage.getItem('drapedrop_currentUser') || 'null');
-	if (!currentUser) { alert('Please login first.'); return; }
+    const currentUser = JSON.parse(localStorage.getItem('drapedrop_currentUser') || 'null');
+    if (!currentUser) { alert('Please login first.'); return; }
 
-	// Load products with fallback to defaults if not present in localStorage
-	let products = [];
-	const savedProducts = localStorage.getItem('drapedrop_products');
-	if (savedProducts) {
-		products = JSON.parse(savedProducts);
-	} else {
-		products = [
-			{
-				id: 1,
-				name: "Elegant Black Evening Dress",
-				brand: "Fashion House",
-				color: "Black",
-				size: "M",
-				condition: "Excellent",
-				originalPrice: 24999,
-				currentPrice: 12499,
-				rentPrice: 1999,
-				type: "sale",
-				image: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=400&h=500&fit=crop",
-				description: "Beautiful black evening dress perfect for special occasions. Worn only twice, excellent condition."
-			},
-			{
-				id: 2,
-				name: "Summer Floral Dress",
-				brand: "Spring Collection",
-				color: "Blue",
-				size: "S",
-				condition: "Good",
-				originalPrice: 7499,
-				currentPrice: 3749,
-				rentPrice: 1199,
-				type: "rent",
-				image: "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=400&h=500&fit=crop",
-				description: "Light and comfortable summer dress with floral pattern. Perfect for outdoor events."
-			},
-			{
-				id: 3,
-				name: "Red Cocktail Dress",
-				brand: "Elegance",
-				color: "Red",
-				size: "L",
-				condition: "Very Good",
-				originalPrice: 16699,
-				currentPrice: 8349,
-				rentPrice: 1599,
-				type: "sale",
-				image: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=400&h=500&fit=crop",
-				description: "Stunning red cocktail dress for parties and events. Great condition with minor wear."
-			}
-		];
-		localStorage.setItem('drapedrop_products', JSON.stringify(products));
-	}
+    // Load products with fallback to defaults if not present in localStorage
+    let products = [];
+    const savedProducts = localStorage.getItem('drapedrop_products');
+    if (savedProducts) {
+        products = JSON.parse(savedProducts);
+    } else {
+        products = [
+            {
+                id: 1,
+                name: "Elegant Black Evening Dress",
+                brand: "Fashion House",
+                color: "Black",
+                size: "M",
+                condition: "Excellent",
+                originalPrice: 24999,
+                currentPrice: 12499,
+                rentPrice: 1999,
+                type: "sale",
+                image: "https://images.unsplash.com/photo-1595777457583-95e059d581b8?w=400&h=500&fit=crop",
+                description: "Beautiful black evening dress perfect for special occasions. Worn only twice, excellent condition."
+            },
+            {
+                id: 2,
+                name: "Summer Floral Dress",
+                brand: "Spring Collection",
+                color: "Blue",
+                size: "S",
+                condition: "Good",
+                originalPrice: 7499,
+                currentPrice: 3749,
+                rentPrice: 1199,
+                type: "rent",
+                image: "https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?w=400&h=500&fit=crop",
+                description: "Light and comfortable summer dress with floral pattern. Perfect for outdoor events."
+            },
+            {
+                id: 3,
+                name: "Red Cocktail Dress",
+                brand: "Elegance",
+                color: "Red",
+                size: "L",
+                condition: "Very Good",
+                originalPrice: 16699,
+                currentPrice: 8349,
+                rentPrice: 1599,
+                type: "sale",
+                image: "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=400&h=500&fit=crop",
+                description: "Stunning red cocktail dress for parties and events. Great condition with minor wear."
+            }
+        ];
+        localStorage.setItem('drapedrop_products', JSON.stringify(products));
+    }
 
-	const product = products.find(p => p.id === productId);
-	if (!product) { alert('Product not found'); return; }
+    const product = products.find(p => p.id === productId);
+    if (!product) { alert('Product not found'); return; }
 
-	const requests = JSON.parse(localStorage.getItem('drapedrop_buyRequests') || '[]');
-	const request = {
-		id: Date.now(),
-		productId: product.id,
-		userEmail: currentUser.email,
-		userName: [currentUser.firstName, currentUser.lastName].filter(Boolean).join(' '),
-		status: 'pending',
-		createdAt: new Date().toISOString(),
-		product: {
-			id: product.id,
-			name: product.name,
-			brand: product.brand,
-			color: product.color,
-			size: product.size,
-			currentPrice: product.currentPrice,
-			rentPrice: product.rentPrice,
-			type: product.type,
-			image: product.image
-		}
-	};
-	requests.push(request);
-	localStorage.setItem('drapedrop_buyRequests', JSON.stringify(requests));
-	closeSlidingWindow();
-	window.location.href = 'requests.html';
+    const requests = JSON.parse(localStorage.getItem('drapedrop_buyRequests') || '[]');
+    const request = {
+        id: Date.now(),
+        productId: product.id,
+        userEmail: currentUser.email,
+        userName: [currentUser.firstName, currentUser.lastName].filter(Boolean).join(' '),
+        status: 'pending',
+        createdAt: new Date().toISOString(),
+        product: {
+            id: product.id,
+            name: product.name,
+            brand: product.brand,
+            color: product.color,
+            size: product.size,
+            currentPrice: product.currentPrice,
+            rentPrice: product.rentPrice,
+            type: product.type,
+            image: product.image
+        }
+    };
+    requests.push(request);
+    localStorage.setItem('drapedrop_buyRequests', JSON.stringify(requests));
+    closeSlidingWindow();
+    window.location.href = 'requests.html';
 }
 
 function proceedToRent(productId) {
@@ -1053,7 +1053,7 @@ function closeSlidingWindow(windowElement) {
 
 function cleanupOldCartData() {
     const cart = JSON.parse(localStorage.getItem('drapedrop_cart') || '[]');
-    
+
     // Check if cart contains only IDs (old format)
     if (cart.length > 0 && typeof cart[0] === 'number') {
         // Load products
@@ -1108,13 +1108,13 @@ function cleanupOldCartData() {
                 }
             ];
         }
-        
+
         // Convert IDs to full product objects
         const newCart = cart.map(id => {
             const product = products.find(p => p.id === id);
             return product || null;
         }).filter(item => item !== null);
-        
+
         // Save updated cart
         localStorage.setItem('drapedrop_cart', JSON.stringify(newCart));
     }
@@ -1124,10 +1124,10 @@ function cleanupOldCartData() {
 function previewImage(event) {
     const file = event.target.files[0];
     const preview = document.getElementById('imagePreview');
-    
+
     if (file) {
         const reader = new FileReader();
-        reader.onload = function(e) {
+        reader.onload = function (e) {
             preview.innerHTML = `
                 <img src="${e.target.result}" alt="Preview" style="max-width: 100%; max-height: 200px; object-fit: cover; border-radius: 8px;">
                 <p style="margin-top: 10px; font-size: 0.9rem; color: #666;">Image selected: ${file.name}</p>
@@ -1148,10 +1148,10 @@ function resetImagePreview() {
 // Add product to display with animation
 function addProductToDisplay(product) {
     console.log('Adding product to display:', product);
-    
+
     // Try to find the products grid
     let productsGrid = document.querySelector('.products-grid');
-    
+
     // If not found, try to find it in the active tab
     if (!productsGrid) {
         console.log('Products grid not found, looking in active tab...');
@@ -1160,7 +1160,7 @@ function addProductToDisplay(product) {
             productsGrid = activeTab.querySelector('.products-grid');
         }
     }
-    
+
     // If still not found, try to find it in the products tab specifically
     if (!productsGrid) {
         console.log('Products grid still not found, looking in products tab...');
@@ -1169,24 +1169,24 @@ function addProductToDisplay(product) {
             productsGrid = productsTab.querySelector('.products-grid');
         }
     }
-    
+
     // If still not found, refresh the products display
     if (!productsGrid) {
         console.log('Products grid not found, refreshing display...');
         refreshProductsDisplay();
         productsGrid = document.querySelector('.products-grid');
     }
-    
+
     if (!productsGrid) {
         console.error('Could not find products grid anywhere');
         showNotification('Error: Could not display new product');
         return;
     }
-    
+
     // Create new product card element
     const productCard = document.createElement('div');
     productCard.className = 'product-card new-product';
-    
+
     productCard.innerHTML = `
         <img src="${product.image}" alt="${product.name}" class="product-image">
         <div class="product-info">
@@ -1194,22 +1194,22 @@ function addProductToDisplay(product) {
             <p>Brand: ${product.brand} | Color: ${product.color} | Size: ${product.size}</p>
             <p>Condition: ${product.condition}</p>
             <p>Original Price: ₹${product.originalPrice.toLocaleString('en-IN')}</p>
-            <p>${product.type === 'sale' ? 
-                `Sale Price: ₹${product.currentPrice.toLocaleString('en-IN')}` : 
-                `Rent Price: ₹${product.rentPrice.toLocaleString('en-IN')}/day`
-            }</p>
+            <p>${product.type === 'sale' ?
+            `Sale Price: ₹${product.currentPrice.toLocaleString('en-IN')}` :
+            `Rent Price: ₹${product.rentPrice.toLocaleString('en-IN')}/day`
+        }</p>
             <div class="product-actions">
                 <button class="btn btn-secondary" onclick="editProduct(${product.id})">Edit</button>
                 <button class="btn btn-danger" onclick="deleteProduct(${product.id})">Delete</button>
             </div>
         </div>
     `;
-    
+
     // Add to the beginning of the grid for better visual effect
     productsGrid.insertBefore(productCard, productsGrid.firstChild);
-    
+
     console.log('Product added to display successfully');
-    
+
     // Add success highlight animation
     setTimeout(() => {
         productCard.style.boxShadow = '0 0 20px rgba(102, 126, 234, 0.3)';
@@ -1222,19 +1222,19 @@ function addProductToDisplay(product) {
 // Refresh products display
 function refreshProductsDisplay() {
     console.log('Starting refreshProductsDisplay...');
-    
+
     // Load products from localStorage
     let products = [];
     const savedProducts = localStorage.getItem('drapedrop_products');
     if (savedProducts) {
         products = JSON.parse(savedProducts);
     }
-    
+
     console.log('Loaded products:', products.length);
-    
+
     // Try to find the products grid
     let productsGrid = document.querySelector('.products-grid');
-    
+
     // If not found, try to find it in the active tab
     if (!productsGrid) {
         console.log('Products grid not found, looking in active tab...');
@@ -1243,7 +1243,7 @@ function refreshProductsDisplay() {
             productsGrid = activeTab.querySelector('.products-grid');
         }
     }
-    
+
     // If still not found, try to find it in the products tab specifically
     if (!productsGrid) {
         console.log('Products grid still not found, looking in products tab...');
@@ -1252,15 +1252,15 @@ function refreshProductsDisplay() {
             productsGrid = productsTab.querySelector('.products-grid');
         }
     }
-    
+
     if (!productsGrid) {
         console.error('Could not find products grid anywhere');
         showNotification('Error: Could not refresh products display');
         return;
     }
-    
+
     console.log('Found products grid, updating content...');
-    
+
     // Update the products grid content (newest first)
     productsGrid.innerHTML = products.reverse().map(product => `
         <div class="product-card">
@@ -1270,10 +1270,10 @@ function refreshProductsDisplay() {
                 <p>Brand: ${product.brand} | Color: ${product.color} | Size: ${product.size}</p>
                 <p>Condition: ${product.condition}</p>
                 <p>Original Price: ₹${product.originalPrice.toLocaleString('en-IN')}</p>
-                <p>${product.type === 'sale' ? 
-                    `Sale Price: ₹${product.currentPrice.toLocaleString('en-IN')}` : 
-                    `Rent Price: ₹${product.rentPrice.toLocaleString('en-IN')}/day`
-                }</p>
+                <p>${product.type === 'sale' ?
+            `Sale Price: ₹${product.currentPrice.toLocaleString('en-IN')}` :
+            `Rent Price: ₹${product.rentPrice.toLocaleString('en-IN')}/day`
+        }</p>
                 <div class="product-actions">
                     <button class="btn btn-secondary" onclick="editProduct(${product.id})">Edit</button>
                     <button class="btn btn-danger" onclick="deleteProduct(${product.id})">Delete</button>
@@ -1281,9 +1281,9 @@ function refreshProductsDisplay() {
             </div>
         </div>
     `).join('');
-    
+
     console.log('Products grid updated with', products.length, 'products');
-    
+
     // Add animation to the first product (newest) if there are products
     const firstProduct = productsGrid.querySelector('.product-card');
     if (firstProduct) {
@@ -1296,17 +1296,17 @@ function refreshProductsDisplay() {
             }, 2000);
         }, 100);
     }
-    
+
     console.log('RefreshProductsDisplay completed');
 }
 
 // Add product to display instantly (real-time) - like before
 function addProductToDisplayInstantly(product) {
     console.log('Adding product instantly:', product);
-    
+
     // Find the products grid immediately
     let productsGrid = document.querySelector('.products-grid');
-    
+
     // If not found, look in active tab
     if (!productsGrid) {
         const activeTab = document.querySelector('.tab-content.active');
@@ -1314,7 +1314,7 @@ function addProductToDisplayInstantly(product) {
             productsGrid = activeTab.querySelector('.products-grid');
         }
     }
-    
+
     // If still not found, look in products tab
     if (!productsGrid) {
         const productsTab = document.getElementById('productsTab');
@@ -1322,16 +1322,16 @@ function addProductToDisplayInstantly(product) {
             productsGrid = productsTab.querySelector('.products-grid');
         }
     }
-    
+
     if (!productsGrid) {
         console.error('Could not find products grid for instant display');
         return;
     }
-    
+
     // Create new product card element
     const productCard = document.createElement('div');
     productCard.className = 'product-card new-product';
-    
+
     productCard.innerHTML = `
         <img src="${product.image}" alt="${product.name}" class="product-image">
         <div class="product-info">
@@ -1339,22 +1339,22 @@ function addProductToDisplayInstantly(product) {
             <p>Brand: ${product.brand} | Color: ${product.color} | Size: ${product.size}</p>
             <p>Condition: ${product.condition}</p>
             <p>Original Price: ₹${product.originalPrice.toLocaleString('en-IN')}</p>
-            <p>${product.type === 'sale' ? 
-                `Sale Price: ₹${product.currentPrice.toLocaleString('en-IN')}` : 
-                `Rent Price: ₹${product.rentPrice.toLocaleString('en-IN')}/day`
-            }</p>
+            <p>${product.type === 'sale' ?
+            `Sale Price: ₹${product.currentPrice.toLocaleString('en-IN')}` :
+            `Rent Price: ₹${product.rentPrice.toLocaleString('en-IN')}/day`
+        }</p>
             <div class="product-actions">
                 <button class="btn btn-secondary" onclick="editProduct(${product.id})">Edit</button>
                 <button class="btn btn-danger" onclick="deleteProduct(${product.id})">Delete</button>
             </div>
         </div>
     `;
-    
+
     // Add to the beginning of the grid instantly
     productsGrid.insertBefore(productCard, productsGrid.firstChild);
-    
+
     console.log('Product added instantly to display');
-    
+
     // Add the 2-second glow animation (like before)
     productCard.style.boxShadow = '0 0 20px rgba(102, 126, 234, 0.3)';
     setTimeout(() => {
@@ -1371,7 +1371,7 @@ function setupImageSlots() {
     window.editSelectedSlot = editSelectedSlot;
     window.deleteSelectedSlot = deleteSelectedSlot;
 
-    ['front','back','side','full','other'].forEach(renderSlot);
+    ['front', 'back', 'side', 'full', 'other'].forEach(renderSlot);
     updateImageCounter();
     renderViewPanel();
 }
@@ -1380,7 +1380,7 @@ function onSlotInputChange(event, slotKey) {
     const file = event.target.files && event.target.files[0];
     if (!file) return;
     const reader = new FileReader();
-    reader.onload = function(e) {
+    reader.onload = function (e) {
         newProductImages[slotKey] = e.target.result;
         renderSlot(slotKey);
         updateImageCounter();
@@ -1403,7 +1403,7 @@ function clearSlot(slotKey, evt) {
     renderSlot(slotKey);
     updateImageCounter();
     if (selectedImageSlot === slotKey) {
-        const next = ['front','full','side','back','other'].find(k => newProductImages[k]);
+        const next = ['front', 'full', 'side', 'back', 'other'].find(k => newProductImages[k]);
         selectedImageSlot = next || null;
         renderViewPanel();
     }

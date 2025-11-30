@@ -594,6 +594,10 @@
             coderesult.confirm(code).then(function () {
                 document.getElementsByClassName('p-conf')[0].style.display = 'block';
                 document.getElementsByClassName('n-conf')[0].style.display = 'none';
+
+                // Set verified flag and update button state
+                sessionStorage.setItem('otp_phone_verified', 'true');
+                checkRegisterButtonState();
             }).catch(function () {
                 document.getElementsByClassName('p-conf')[0].style.display = 'none';
                 document.getElementsByClassName('n-conf')[0].style.display = 'block';
@@ -793,17 +797,12 @@
                 createdAt: new Date().toISOString()
             };
 
-            // For sellers, check if both email and phone OTP are verified
+            // For sellers, check if phone OTP is verified
             if (currentUserType === 'admin') {
-                const emailVerified = sessionStorage.getItem('otp_email_verified') === 'true';
                 const phoneVerified = sessionStorage.getItem('otp_phone_verified') === 'true';
 
-                if (!emailVerified || !phoneVerified) {
-                    const missingVerifications = [];
-                    if (!emailVerified) missingVerifications.push('email');
-                    if (!phoneVerified) missingVerifications.push('phone');
-
-                    showMessage('registerMessage', `Please verify your ${missingVerifications.join(' and ')} via OTP before registering.`, 'error');
+                if (!phoneVerified) {
+                    showMessage('registerMessage', `Please verify your phone number via OTP before registering.`, 'error');
                     return;
                 }
             }
@@ -812,29 +811,53 @@
             if (currentUserType === 'user') {
                 users.push(newUser);
                 localStorage.setItem('drapedrop_users', JSON.stringify(users));
-                showMessage('registerMessage', 'Registration successful! You can now login.', 'success');
+
+                // Auto-login for user
+                const sessionData = {
+                    id: newUser.id,
+                    firstName: newUser.firstName,
+                    lastName: newUser.lastName,
+                    email: newUser.email,
+                    type: newUser.type,
+                    loginTime: new Date().toISOString()
+                };
+                localStorage.setItem('drapedrop_currentUser', JSON.stringify(sessionData));
+
+                showMessage('registerMessage', 'Registration successful! Redirecting...', 'success');
                 event.target.reset();
+
                 // Clear OTP verification status
-                sessionStorage.removeItem('otp_email_verified');
                 sessionStorage.removeItem('otp_phone_verified');
 
                 // Reset OTP fields
                 resetOtpFields();
 
-                setTimeout(() => { switchTab('login'); }, 2000);
+                setTimeout(() => { window.location.href = 'index.html'; }, 1000);
             } else {
                 admins.push(newUser);
                 localStorage.setItem('drapedrop_admins', JSON.stringify(admins));
-                showMessage('registerMessage', 'Registration successful! You can now login.', 'success');
+
+                // Auto-login for seller
+                const sessionData = {
+                    id: newUser.id,
+                    firstName: newUser.firstName,
+                    lastName: newUser.lastName,
+                    email: newUser.email,
+                    type: newUser.type,
+                    loginTime: new Date().toISOString()
+                };
+                localStorage.setItem('drapedrop_currentUser', JSON.stringify(sessionData));
+
+                showMessage('registerMessage', 'Registration successful! Redirecting to dashboard...', 'success');
                 event.target.reset();
+
                 // Clear OTP verification status
-                sessionStorage.removeItem('otp_email_verified');
                 sessionStorage.removeItem('otp_phone_verified');
 
                 // Reset OTP fields
                 resetOtpFields();
 
-                setTimeout(() => { switchTab('login'); }, 2000);
+                setTimeout(() => { window.location.href = 'index.html'; }, 1000);
             }
         }
 
@@ -855,10 +878,6 @@
             }
             if (emailOtpStatus) emailOtpStatus.textContent = '';
             if (phoneOtpStatus) phoneOtpStatus.textContent = '';
-
-            // Clear OTP store
-            otpStore.email = null;
-            otpStore.phone = null;
         }
 
         // Format phone number as user types
