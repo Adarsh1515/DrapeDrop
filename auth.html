@@ -149,6 +149,18 @@
             background-color: #d0d0d0;
         }
 
+        .btn-inline.success {
+            background-color: #28a745;
+            color: white;
+            border-color: #28a745;
+        }
+
+        .btn-inline.error {
+            background-color: #dc3545;
+            color: white;
+            border-color: #dc3545;
+        }
+
         .otp-actions input[type="text"] {
             flex: 1;
             padding: 8px 12px;
@@ -341,6 +353,92 @@
             border-color: red;
             background-color: rgba(255, 0, 4, 0.5);
         }
+
+        .phone-input-container {
+            display: flex;
+            gap: 10px;
+            align-items: stretch;
+            /* Ensure equal height */
+        }
+
+        .phone-input-container input {
+            flex: 1;
+        }
+
+        .phone-input-container button {
+            white-space: nowrap;
+            padding: 0 25px;
+            /* Increased padding */
+            background-color: #667eea;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 1rem;
+            /* Increased font size */
+            transition: background-color 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .phone-input-container button:hover {
+            background-color: #5a6fd6;
+        }
+
+        .otp-verify-section {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .otp-timer-container {
+            margin-top: 10px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+
+        #otpTimerText {
+            color: #666;
+            font-weight: 500;
+        }
+
+        .resend-btn {
+            background: none;
+            border: none;
+            color: #667eea;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: underline;
+            padding: 0;
+            font-size: 0.9rem;
+        }
+
+        .resend-btn:hover {
+            color: #5a6fd6;
+        }
+
+        .auth-footer {
+            margin-top: 20px;
+            text-align: center;
+            font-size: 0.95rem;
+            color: #666;
+            border-top: 1px solid #eee;
+            padding-top: 20px;
+        }
+
+        .auth-footer a {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .auth-footer a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 
@@ -354,11 +452,6 @@
             </div>
 
             <div class="auth-main">
-                <div class="auth-tabs">
-                    <div class="auth-tab active" onclick="switchTab('login')">Login</div>
-                    <div class="auth-tab" onclick="switchTab('register')">Register</div>
-                </div>
-
                 <!-- Login Form -->
                 <div class="auth-form active" id="loginForm">
                     <div class="user-type-selector">
@@ -388,6 +481,9 @@
                     <div class="forgot-password">
                         <a href="#" onclick="showForgotPassword()">Forgot Password?</a>
                     </div>
+                    <div class="auth-footer">
+                        <p>Don't have an account? <a href="#" onclick="switchTab('register')">Register</a></p>
+                    </div>
                 </div>
 
                 <!-- Register Form -->
@@ -412,8 +508,8 @@
                         </div>
 
                         <div class="form-group">
-                            <div class="otp-actions otp-for-seller" id="emailOtpRow" style="display: none;">
-                                <div id="recaptcha-container"></div>
+                            <div class="otp-actions" id="emailOtpRow" style="display: none;">
+                                <!-- Invisible Recaptcha attached to button -->
                             </div>
                             <label for="registerEmail">Email Address</label>
                             <input type="email" id="registerEmail" required>
@@ -422,19 +518,28 @@
 
                         <div class="form-group">
                             <label for="registerPhone">Phone Number</label>
-                            <input type="tel" id="registerPhone" placeholder="+91 98765 43210"
-                                oninput="formatPhoneNumber(this)" required>
+                            <div class="phone-input-container">
+                                <input type="tel" id="registerPhone" placeholder="+91 98765 43210"
+                                    oninput="formatPhoneNumber(this)" required>
+                                <button type="button" id="sendOtpBtn" class="btn-inline" onclick="phoneAuth()">Send
+                                    OTP</button>
+                            </div>
                             <small style="color: #666; font-size: 0.9rem;">Enter with country code (e.g., +91 for
                                 India)</small>
-                            <div class="otp-actions otp-for-seller" id="phoneOtpRow" style="display: none;">
-                                <button type="button" class="btn-inline" onclick="phoneAuth()">Send OTP</button>
-                                <input type="text" id="phoneOtpInput" placeholder="Enter OTP" maxlength="6">
-                                <button type="button" class="btn-inline secondary"
-                                    onclick="codeverify()">Verify</button>
-                                <span class="otp-status" id="phoneOtpStatus"></span>
+
+                            <div class="otp-verify-section" id="otpVerifySection" style="display: none;">
+                                <div class="otp-actions">
+                                    <input type="text" id="phoneOtpInput" placeholder="Enter OTP" maxlength="6">
+                                    <button type="button" class="btn-inline secondary" id="verifyOtpBtn"
+                                        onclick="codeverify()">Verify</button>
+                                    <span class="otp-status" id="phoneOtpStatus"></span>
+                                </div>
+                                <div class="otp-timer-container">
+                                    <span id="otpTimerText">Resend OTP in 15s</span>
+                                    <button type="button" id="resendOtpBtn" class="resend-btn" onclick="resendOtp()"
+                                        style="display: none;">Resend OTP</button>
+                                </div>
                             </div>
-                            <div class="p-conf">Number Verified</div>
-                            <div class="n-conf">OTP Error</div>
                         </div>
 
                         <div class="form-group">
@@ -453,6 +558,9 @@
                         </button>
                         <div id="verificationStatus" class="verification-status" style="display: none;">
                             <p><i class="fas fa-info-circle"></i> <span id="verificationText"></span></p>
+                        </div>
+                        <div class="auth-footer">
+                            <p>Already have an account? <a href="#" onclick="switchTab('login')">Login</a></p>
                         </div>
                     </form>
                 </div>
@@ -512,10 +620,6 @@
         function switchTab(tab) {
             currentTab = tab;
 
-            // Update tab styling
-            document.querySelectorAll('.auth-tab').forEach(t => t.classList.remove('active'));
-            event.target.classList.add('active');
-
             // Show/hide forms
             document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
             document.getElementById(tab + 'Form').classList.add('active');
@@ -537,27 +641,36 @@
             document.querySelectorAll('.user-type-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
 
-            // Show/hide OTP fields for sellers
-            const otpRows = document.querySelectorAll('.otp-for-seller');
-            otpRows.forEach(row => {
-                if (type === 'admin') {
-                    row.style.display = 'flex';
-                } else {
-                    row.style.display = 'none';
-                }
-            });
-
             // Clear OTP verification status when switching user types
-            // Clear OTP verification status when switching user types
-            if (type === 'user') {
-                sessionStorage.removeItem('otp_phone_verified');
+            sessionStorage.removeItem('otp_phone_verified');
+            const phoneOtpInput = document.getElementById('phoneOtpInput');
+            const phoneOtpStatus = document.getElementById('phoneOtpStatus');
+            if (phoneOtpInput) phoneOtpInput.value = '';
+            if (phoneOtpStatus) phoneOtpStatus.textContent = '';
 
-                // Reset OTP input fields and status
-                const phoneOtpInput = document.getElementById('phoneOtpInput');
-                const phoneOtpStatus = document.getElementById('phoneOtpStatus');
+            // Reset verify button
+            const verifyBtn = document.getElementById('verifyOtpBtn');
+            if (verifyBtn) {
+                verifyBtn.textContent = 'Verify';
+                verifyBtn.classList.remove('success', 'error');
+                verifyBtn.classList.add('secondary');
+                verifyBtn.disabled = false;
+            }
 
-                if (phoneOtpInput) phoneOtpInput.value = '';
-                if (phoneOtpStatus) phoneOtpStatus.textContent = '';
+            // Clear timer
+            if (otpTimerInterval) clearInterval(otpTimerInterval);
+
+            // Ensure OTP verify section is hidden initially
+            const otpVerifySection = document.getElementById('otpVerifySection');
+            if (otpVerifySection) otpVerifySection.style.display = 'none';
+
+            // Reset Send OTP button
+            const sendOtpBtn = document.getElementById('sendOtpBtn');
+            if (sendOtpBtn) {
+                sendOtpBtn.style.display = 'block';
+                sendOtpBtn.disabled = false;
+                sendOtpBtn.style.opacity = '1';
+                sendOtpBtn.style.cursor = 'pointer';
             }
 
             // Check and update register button state
@@ -573,10 +686,18 @@
         //Recaptcha field
         render();
         function render() {
-            window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container');
+            window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('sendOtpBtn', {
+                'size': 'invisible',
+                'callback': (response) => {
+                    // reCAPTCHA solved, allow signInWithPhoneNumber.
+                    // onSignInSubmit();
+                }
+            });
             recaptchaVerifier.render();
         }
 
+
+        let otpTimerInterval;
 
         // function to send OTP
         function phoneAuth() {
@@ -584,23 +705,103 @@
             firebase.auth().signInWithPhoneNumber(number, window.recaptchaVerifier).then(function (confirmationResult) {
                 window.confirmationResult = confirmationResult;
                 coderesult = confirmationResult;
+
+                // Show OTP verification section
+                document.getElementById('otpVerifySection').style.display = 'block';
+                showMessage('registerMessage', 'OTP sent successfully!', 'success');
+
+                // Start Timer
+                startOtpTimer();
             }).catch(function (error) {
-                alert(error.message);
+                // Re-enable Send OTP button on error
+                const sendOtpBtn = document.getElementById('sendOtpBtn');
+                if (sendOtpBtn) {
+                    sendOtpBtn.disabled = false;
+                    sendOtpBtn.style.opacity = '1';
+                    sendOtpBtn.style.cursor = 'pointer';
+                }
+
+                if (error.code === 'auth/too-many-requests') {
+                    showMessage('registerMessage', "You've reached maximum attempts to generate OTP. Try again later.", 'error');
+                } else {
+                    alert(error.message);
+                }
             });
+        }
+
+        function startOtpTimer() {
+            let timeLeft = 15;
+            const timerText = document.getElementById('otpTimerText');
+            const resendBtn = document.getElementById('resendOtpBtn');
+            const sendOtpBtn = document.getElementById('sendOtpBtn');
+
+            // Reset UI
+            timerText.style.display = 'inline';
+            resendBtn.style.display = 'none';
+            timerText.textContent = `Resend OTP in ${timeLeft}s`;
+
+            // Disable Send OTP button
+            if (sendOtpBtn) {
+                sendOtpBtn.disabled = true;
+                sendOtpBtn.style.opacity = '0.6';
+                sendOtpBtn.style.cursor = 'not-allowed';
+            }
+
+            // Clear existing timer if any
+            if (otpTimerInterval) clearInterval(otpTimerInterval);
+
+            otpTimerInterval = setInterval(() => {
+                timeLeft--;
+                timerText.textContent = `Resend OTP in ${timeLeft}s`;
+
+                if (timeLeft <= 0) {
+                    clearInterval(otpTimerInterval);
+                    timerText.style.display = 'none';
+                    resendBtn.style.display = 'inline';
+
+                    // Enable Send OTP button
+                    if (sendOtpBtn) {
+                        sendOtpBtn.disabled = false;
+                        sendOtpBtn.style.opacity = '1';
+                        sendOtpBtn.style.cursor = 'pointer';
+                    }
+
+                    // Hide success message when timer expires
+                    document.getElementById('registerMessage').innerHTML = '';
+                }
+            }, 1000);
+        }
+
+        function resendOtp() {
+            phoneAuth();
         }
         // function to verify the OTP
         function codeverify() {
             var code = document.getElementById('phoneOtpInput').value;
+            var verifyBtn = document.getElementById('verifyOtpBtn');
+
             coderesult.confirm(code).then(function () {
-                document.getElementsByClassName('p-conf')[0].style.display = 'block';
-                document.getElementsByClassName('n-conf')[0].style.display = 'none';
+                // Success state
+                verifyBtn.textContent = 'Verified';
+                verifyBtn.classList.remove('secondary', 'error');
+                verifyBtn.classList.add('success');
+                verifyBtn.disabled = true; // Prevent re-verification
 
                 // Set verified flag and update button state
                 sessionStorage.setItem('otp_phone_verified', 'true');
                 checkRegisterButtonState();
             }).catch(function () {
-                document.getElementsByClassName('p-conf')[0].style.display = 'none';
-                document.getElementsByClassName('n-conf')[0].style.display = 'block';
+                // Error state
+                verifyBtn.textContent = 'Invalid';
+                verifyBtn.classList.remove('secondary', 'success');
+                verifyBtn.classList.add('error');
+
+                // Reset to "Verify" after a delay to allow retry
+                setTimeout(() => {
+                    verifyBtn.textContent = 'Verify';
+                    verifyBtn.classList.remove('error');
+                    verifyBtn.classList.add('secondary');
+                }, 2000);
             });
         }
         // const otpStore = { email: null, phone: null };
@@ -656,6 +857,7 @@
         // }
 
         // Function to check and update register button state
+        // Function to check and update register button state
         function checkRegisterButtonState() {
             const registerButton = document.querySelector('#registerForm .submit-btn');
             const verificationStatus = document.getElementById('verificationStatus');
@@ -663,33 +865,10 @@
 
             if (!registerButton) return;
 
-            if (currentUserType === 'admin') {
-                const phoneVerified = sessionStorage.getItem('otp_phone_verified') === 'true';
+            const phoneVerified = sessionStorage.getItem('otp_phone_verified') === 'true';
 
-                if (phoneVerified) {
-                    // Verified - enable button
-                    registerButton.disabled = false;
-                    registerButton.style.opacity = '1';
-                    registerButton.style.cursor = 'pointer';
-                    registerButton.title = 'Click to register';
-
-                    // Hide verification status
-                    verificationStatus.style.display = 'none';
-                } else {
-                    // Not verified - disable button
-                    registerButton.disabled = true;
-                    registerButton.style.opacity = '0.5';
-                    registerButton.style.cursor = 'not-allowed';
-
-                    const message = `Please verify your phone number via OTP before registering.`;
-                    registerButton.title = message;
-
-                    // Show verification status
-                    verificationText.textContent = message;
-                    verificationStatus.style.display = 'block';
-                }
-            } else {
-                // For regular users, always enable
+            if (phoneVerified) {
+                // Verified - enable button
                 registerButton.disabled = false;
                 registerButton.style.opacity = '1';
                 registerButton.style.cursor = 'pointer';
@@ -697,6 +876,18 @@
 
                 // Hide verification status
                 verificationStatus.style.display = 'none';
+            } else {
+                // Not verified - disable button
+                registerButton.disabled = true;
+                registerButton.style.opacity = '0.5';
+                registerButton.style.cursor = 'not-allowed';
+
+                const message = `Please verify your phone number via OTP before registering.`;
+                registerButton.title = message;
+
+                // Show verification status
+                verificationText.textContent = message;
+                verificationStatus.style.display = 'block';
             }
         }
 
@@ -921,6 +1112,14 @@
             // Initialize register button state
             checkRegisterButtonState();
         };
+        // Check for tab parameter in URL
+        window.addEventListener('DOMContentLoaded', (event) => {
+            const urlParams = new URLSearchParams(window.location.search);
+            const tab = urlParams.get('tab');
+            if (tab === 'register') {
+                switchTab('register');
+            }
+        });
     </script>
 </body>
 

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,18 +16,18 @@
             justify-content: center;
             padding: 20px;
         }
-        
+
         .login-card {
             background: white;
             border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
             overflow: hidden;
             width: 100%;
             max-width: 900px;
             display: flex;
             min-height: 600px;
         }
-        
+
         .login-sidebar {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
@@ -36,19 +37,19 @@
             justify-content: center;
             width: 40%;
         }
-        
+
         .login-sidebar h2 {
             font-size: 2rem;
             margin-bottom: 20px;
             text-align: center;
         }
-        
+
         .login-sidebar p {
             text-align: center;
             line-height: 1.6;
             opacity: 0.9;
         }
-        
+
         .login-main {
             padding: 40px;
             width: 60%;
@@ -56,13 +57,13 @@
             flex-direction: column;
             justify-content: center;
         }
-        
+
         .login-tabs {
             display: flex;
             margin-bottom: 30px;
             border-bottom: 2px solid #f0f0f0;
         }
-        
+
         .login-tab {
             flex: 1;
             padding: 15px;
@@ -73,31 +74,31 @@
             transition: all 0.3s ease;
             border-bottom: 3px solid transparent;
         }
-        
+
         .login-tab.active {
             color: #667eea;
             border-bottom-color: #667eea;
         }
-        
+
         .login-form {
             display: none;
         }
-        
+
         .login-form.active {
             display: block;
         }
-        
+
         .form-group {
             margin-bottom: 20px;
         }
-        
+
         .form-group label {
             display: block;
             margin-bottom: 8px;
             font-weight: 600;
             color: #333;
         }
-        
+
         .form-group input {
             width: 100%;
             padding: 12px 15px;
@@ -106,18 +107,18 @@
             font-size: 1rem;
             transition: border-color 0.3s ease;
         }
-        
+
         .form-group input:focus {
             outline: none;
             border-color: #667eea;
         }
-        
+
         .form-row {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 15px;
         }
-        
+
         .submit-btn {
             width: 100%;
             padding: 15px;
@@ -131,27 +132,27 @@
             transition: all 0.3s ease;
             margin-top: 20px;
         }
-        
+
         .submit-btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
         }
-        
+
         .forgot-password {
             text-align: center;
             margin-top: 15px;
         }
-        
+
         .forgot-password a {
             color: #667eea;
             text-decoration: none;
             font-size: 0.9rem;
         }
-        
+
         .forgot-password a:hover {
             text-decoration: underline;
         }
-        
+
         .error-message {
             background: #fee;
             color: #c33;
@@ -160,7 +161,7 @@
             margin-bottom: 15px;
             font-size: 0.9rem;
         }
-        
+
         .success-message {
             background: #efe;
             color: #3c3;
@@ -169,13 +170,13 @@
             margin-bottom: 15px;
             font-size: 0.9rem;
         }
-        
+
         .user-type-selector {
             display: flex;
             gap: 10px;
             margin-bottom: 20px;
         }
-        
+
         .user-type-btn {
             flex: 1;
             padding: 10px;
@@ -186,18 +187,18 @@
             transition: all 0.3s ease;
             font-weight: 600;
         }
-        
+
         .user-type-btn.active {
             border-color: #667eea;
             background: #667eea;
             color: white;
         }
-        
+
         .back-to-home {
             text-align: center;
             margin-top: 20px;
         }
-        
+
         .back-to-home a {
             color: #667eea;
             text-decoration: none;
@@ -206,37 +207,37 @@
             align-items: center;
             gap: 5px;
         }
-        
+
         .back-to-home a:hover {
             text-decoration: underline;
         }
-        
+
         @media (max-width: 768px) {
             .login-card {
                 flex-direction: column;
                 max-width: 400px;
             }
-            
+
             .login-sidebar {
                 width: 100%;
                 padding: 30px 20px;
             }
-            
+
             .login-main {
                 width: 100%;
                 padding: 30px 20px;
             }
-            
+
             .form-row {
                 grid-template-columns: 1fr;
             }
-            
+
             /* Make phone input responsive on mobile */
             .form-group div[style*="display: flex"] {
                 flex-direction: column;
                 gap: 8px;
             }
-            
+
             .form-group div[style*="display: flex"] select {
                 width: 100% !important;
             }
@@ -258,14 +259,49 @@
         }
 
         /* OTP UI */
-        .otp-actions { display: grid; grid-template-columns: auto 1fr auto auto; gap: 8px; align-items: center; margin-top: 8px; }
-        .otp-actions .btn-inline { padding: 8px 12px; border-radius: 6px; border: none; background: #667eea; color: #fff; cursor: pointer; }
-        .otp-actions .btn-inline.secondary { background: #44a08d; }
-        .otp-actions input { padding: 10px 12px; border: 2px solid #e1e5e9; border-radius: 6px; }
-        .otp-status { font-size: 0.9rem; font-weight: 600; }
-        .otp-status.ok { color: #2ecc71; }
-        .otp-status.err { color: #e74c3c; }
-        .otp-for-seller { display: none; }
+        .otp-actions {
+            display: grid;
+            grid-template-columns: auto 1fr auto auto;
+            gap: 8px;
+            align-items: center;
+            margin-top: 8px;
+        }
+
+        .otp-actions .btn-inline {
+            padding: 8px 12px;
+            border-radius: 6px;
+            border: none;
+            background: #667eea;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .otp-actions .btn-inline.secondary {
+            background: #44a08d;
+        }
+
+        .otp-actions input {
+            padding: 10px 12px;
+            border: 2px solid #e1e5e9;
+            border-radius: 6px;
+        }
+
+        .otp-status {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+
+        .otp-status.ok {
+            color: #2ecc71;
+        }
+
+        .otp-status.err {
+            color: #e74c3c;
+        }
+
+        .otp-for-seller {
+            display: none;
+        }
 
         /* New product animation */
         @keyframes slideInFromTop {
@@ -273,6 +309,7 @@
                 opacity: 0;
                 transform: translateY(-20px);
             }
+
             100% {
                 opacity: 1;
                 transform: translateY(0);
@@ -285,6 +322,7 @@
                 opacity: 1;
                 transform: scale(1);
             }
+
             100% {
                 opacity: 0;
                 transform: scale(0.8);
@@ -292,60 +330,62 @@
         }
     </style>
 </head>
+
 <body>
     <div class="login-container">
         <div class="login-card">
             <div class="login-sidebar">
                 <h2><i class="fas fa-tshirt"></i> DrapeDrop</h2>
-                <p>Your trusted platform for buying and renting pre-loved dresses. Join our community of fashion enthusiasts!</p>
+                <p>Your trusted platform for buying and renting pre-loved dresses. Join our community of fashion
+                    enthusiasts!</p>
             </div>
-            
+
             <div class="login-main">
                 <div class="login-tabs">
                     <div class="login-tab active" onclick="switchTab('login')">Login</div>
                     <div class="login-tab" onclick="switchTab('register')">Register</div>
                 </div>
-                
+
                 <!-- Login Form -->
                 <div class="login-form active" id="loginForm">
                     <div class="user-type-selector">
                         <button class="user-type-btn active" onclick="selectUserType('user')">User</button>
                         <button class="user-type-btn" onclick="selectUserType('admin')">Seller</button>
                     </div>
-                    
+
                     <div id="loginMessage"></div>
-                    
+
                     <form onsubmit="handleLogin(event)">
                         <div class="form-group">
                             <label for="loginEmail">Email Address</label>
                             <input type="email" id="loginEmail" required>
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="loginPassword">Password</label>
                             <input type="password" id="loginPassword" required>
                         </div>
-                        
+
                         <button type="submit" class="submit-btn">
                             <i class="fas fa-sign-in-alt"></i>
                             Login
                         </button>
                     </form>
-                    
+
                     <div class="forgot-password">
                         <a href="#" onclick="showForgotPassword()">Forgot Password?</a>
                     </div>
                 </div>
-                
+
                 <!-- Register Form -->
                 <div class="login-form" id="registerForm">
                     <div class="user-type-selector">
                         <button class="user-type-btn active" onclick="selectUserType('user')">User</button>
                         <button class="user-type-btn" onclick="selectUserType('admin')">Seller</button>
                     </div>
-                    
+
                     <div id="registerMessage"></div>
-                    
+
                     <form onsubmit="handleRegister(event)">
                         <div class="form-row">
                             <div class="form-group">
@@ -357,22 +397,24 @@
                                 <input type="text" id="registerLastName" required>
                             </div>
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="registerEmail">Email Address</label>
                             <input type="email" id="registerEmail" required>
                             <div class="otp-actions otp-for-seller" id="emailOtpRow">
                                 <button type="button" class="btn-inline" onclick="sendOtp('email')">Send OTP</button>
                                 <input type="text" id="emailOtpInput" placeholder="Enter OTP">
-                                <button type="button" class="btn-inline secondary" onclick="verifyOtp('email')">Verify</button>
+                                <button type="button" class="btn-inline secondary"
+                                    onclick="verifyOtp('email')">Verify</button>
                                 <span class="otp-status" id="emailOtpStatus"></span>
                             </div>
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="registerPhone">Phone Number</label>
                             <div style="display: flex; gap: 10px;">
-                                <select id="registerPhoneCountryCode" style="width: 120px; padding: 12px 15px; border: 2px solid #e1e5e9; border-radius: 8px; font-size: 1rem; background: white;">
+                                <select id="registerPhoneCountryCode"
+                                    style="width: 120px; padding: 12px 15px; border: 2px solid #e1e5e9; border-radius: 8px; font-size: 1rem; background: white;">
                                     <option value="+1">🇺🇸 +1</option>
                                     <option value="+44">🇬🇧 +44</option>
                                     <option value="+91">🇮🇳 +91</option>
@@ -432,28 +474,29 @@
                             <div class="otp-actions otp-for-seller" id="phoneOtpRow">
                                 <button type="button" class="btn-inline" onclick="sendOtp('phone')">Send OTP</button>
                                 <input type="text" id="phoneOtpInput" placeholder="Enter OTP">
-                                <button type="button" class="btn-inline secondary" onclick="verifyOtp('phone')">Verify</button>
+                                <button type="button" class="btn-inline secondary"
+                                    onclick="verifyOtp('phone')">Verify</button>
                                 <span class="otp-status" id="phoneOtpStatus"></span>
                             </div>
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="registerPassword">Password</label>
                             <input type="password" id="registerPassword" required minlength="6">
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="registerConfirmPassword">Confirm Password</label>
                             <input type="password" id="registerConfirmPassword" required minlength="6">
                         </div>
-                        
+
                         <button type="submit" class="submit-btn">
                             <i class="fas fa-user-plus"></i>
                             Register
                         </button>
                     </form>
                 </div>
-                
+
                 <div class="back-to-home">
                     <a href="index.html">
                         <i class="fas fa-arrow-left"></i>
@@ -467,14 +510,14 @@
     <script>
         let currentUserType = 'user';
         let currentTab = 'login';
-        
+
         // Load existing users and admins from localStorage
         let users = [];
         let admins = [];
-        
+
         const savedUsers = localStorage.getItem('drapedrop_users');
         const savedAdmins = localStorage.getItem('drapedrop_admins');
-        
+
         if (savedUsers) {
             users = JSON.parse(savedUsers);
         } else {
@@ -493,7 +536,7 @@
             ];
             localStorage.setItem('drapedrop_users', JSON.stringify(users));
         }
-        
+
         if (savedAdmins) {
             admins = JSON.parse(savedAdmins);
         } else {
@@ -512,18 +555,18 @@
             ];
             localStorage.setItem('drapedrop_admins', JSON.stringify(admins));
         }
-        
+
         function switchTab(tab) {
             currentTab = tab;
-            
+
             // Update tab styling
             document.querySelectorAll('.login-tab').forEach(t => t.classList.remove('active'));
             event.target.classList.add('active');
-            
+
             // Show/hide forms
             document.querySelectorAll('.login-form').forEach(f => f.classList.remove('active'));
             document.getElementById(tab + 'Form').classList.add('active');
-            
+
             // Clear messages
             document.getElementById('loginMessage').innerHTML = '';
             document.getElementById('registerMessage').innerHTML = '';
@@ -532,10 +575,10 @@
             const otpRows = document.querySelectorAll('.otp-for-seller');
             otpRows.forEach(row => row.style.display = (tab === 'register' && currentUserType === 'admin') ? 'grid' : 'none');
         }
-        
+
         function selectUserType(type) {
             currentUserType = type;
-            
+
             // Update button styling
             document.querySelectorAll('.user-type-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
@@ -544,18 +587,18 @@
             const otpRows = document.querySelectorAll('.otp-for-seller');
             otpRows.forEach(row => row.style.display = (currentTab === 'register' && type === 'admin') ? 'grid' : 'none');
         }
-        
+
         function showMessage(elementId, message, type) {
             const element = document.getElementById(elementId);
             element.innerHTML = `<div class="${type}-message">${message}</div>`;
         }
-        
+
         function handleLogin(event) {
             event.preventDefault();
-            
+
             const email = document.getElementById('loginEmail').value;
             const password = document.getElementById('loginPassword').value;
-            
+
             // Check if user exists
             let user = null;
             if (currentUserType === 'user') {
@@ -563,7 +606,7 @@
             } else {
                 user = admins.find(a => a.email === email && a.password === password);
             }
-            
+
             if (user) {
                 // Store current user in session
                 const sessionData = {
@@ -574,11 +617,11 @@
                     type: user.type,
                     loginTime: new Date().toISOString()
                 };
-                
+
                 localStorage.setItem('drapedrop_currentUser', JSON.stringify(sessionData));
-                
+
                 showMessage('loginMessage', 'Login successful! Redirecting...', 'success');
-                
+
                 // Redirect: users -> index; sellers -> onboarding until finished
                 setTimeout(() => {
                     if (user.type === 'admin') {
@@ -597,10 +640,10 @@
                 showMessage('loginMessage', 'Invalid email or password. Please try again.', 'error');
             }
         }
-        
+
         function handleRegister(event) {
             event.preventDefault();
-            
+
             const firstName = document.getElementById('registerFirstName').value;
             const lastName = document.getElementById('registerLastName').value;
             const email = document.getElementById('registerEmail').value;
@@ -609,27 +652,27 @@
             const fullPhone = countryCode + phone;
             const password = document.getElementById('registerPassword').value;
             const confirmPassword = document.getElementById('registerConfirmPassword').value;
-            
+
             // Validation
             if (password !== confirmPassword) {
                 showMessage('registerMessage', 'Passwords do not match!', 'error');
                 return;
             }
-            
+
             if (password.length < 6) {
                 showMessage('registerMessage', 'Password must be at least 6 characters long!', 'error');
                 return;
             }
-            
+
             // Check if email already exists
             const existingUser = users.find(u => u.email === email);
             const existingAdmin = admins.find(a => a.email === email);
-            
+
             if (existingUser || existingAdmin) {
                 showMessage('registerMessage', 'Email already registered! Please use a different email.', 'error');
                 return;
             }
-            
+
             // For sellers, ensure OTP verified for both email and phone
             if (currentUserType === 'admin') {
                 const emailOk = sessionStorage.getItem('otp_email_verified') === 'true';
@@ -651,7 +694,7 @@
                 type: currentUserType,
                 createdAt: new Date().toISOString()
             };
-            
+
             if (currentUserType === 'user') {
                 users.push(newUser);
                 localStorage.setItem('drapedrop_users', JSON.stringify(users));
@@ -714,16 +757,16 @@
         (function observeTab() {
             const originalSwitch = switchTab;
         })();
-        
+
         function showForgotPassword() {
             const email = prompt('Enter your email address to reset password:');
             if (email) {
                 alert('Password reset link has been sent to your email address. Please check your inbox.');
             }
         }
-        
+
         // Check if user is already logged in
-        window.onload = function() {
+        window.onload = function () {
             const currentUser = localStorage.getItem('drapedrop_currentUser');
             if (currentUser) {
                 // User is already logged in, redirect to dashboard
@@ -734,12 +777,12 @@
         function processOrder(index) {
             const cart = JSON.parse(localStorage.getItem('drapedrop_cart') || '[]');
             const item = cart[index];
-            
+
             if (item) {
                 // Remove the item from cart
                 cart.splice(index, 1);
                 localStorage.setItem('drapedrop_cart', JSON.stringify(cart));
-                
+
                 // Redirect to checkout page with the item
                 const action = item.type === 'sale' ? 'buy' : 'rent';
                 window.location.href = `checkout.html?id=${item.id}&action=${action}`;
@@ -750,10 +793,10 @@
         function previewImage(event) {
             const file = event.target.files[0];
             const preview = document.getElementById('imagePreview');
-            
+
             if (file) {
                 const reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = function (e) {
                     preview.innerHTML = `
                         <img src="${e.target.result}" alt="Preview" style="max-width: 100%; max-height: 200px; object-fit: cover; border-radius: 8px;">
                         <p style="margin-top: 10px; font-size: 0.9rem; color: #666;">Image selected: ${file.name}</p>
@@ -767,14 +810,14 @@
         function addProductToDisplayInstantly(product) {
             // Find grid immediately
             let productsGrid = document.querySelector('.products-grid');
-            
+
             // Create product card
             const productCard = document.createElement('div');
             productCard.className = 'product-card new-product';
-            
+
             // Add to beginning of grid instantly
             productsGrid.insertBefore(productCard, productsGrid.firstChild);
-            
+
             // Immediate highlight
             productCard.style.boxShadow = '0 0 20px rgba(102, 126, 234, 0.3)';
         }
@@ -783,7 +826,7 @@
         setTimeout(() => {
             console.log('Refreshing products display to show new product...');
             refreshProductsDisplay();
-            
+
             // Double-check: if still no products visible, force a complete refresh
             setTimeout(() => {
                 const visibleProducts = document.querySelectorAll('.product-card');
@@ -795,4 +838,5 @@
         }, 200);
     </script>
 </body>
+
 </html>
