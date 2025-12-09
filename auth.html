@@ -463,8 +463,9 @@
 
                     <form onsubmit="handleLogin(event)">
                         <div class="form-group">
-                            <label for="loginEmail">Email Address</label>
-                            <input type="email" id="loginEmail" required>
+                            <label for="loginPhone">Phone Number</label>
+                            <input type="tel" id="loginPhone" placeholder="+91 98765 43210"
+                                oninput="formatPhoneNumber(this)" required>
                         </div>
 
                         <div class="form-group">
@@ -484,6 +485,53 @@
                     <div class="auth-footer">
                         <p>Don't have an account? <a href="#" onclick="switchTab('register')">Register</a></p>
                     </div>
+                </div>
+
+                <!-- Forgot Password Section -->
+                <div class="auth-form" id="forgotPasswordSection" style="display: none;">
+                    <h3>Reset Password</h3>
+                    <p style="color: #666; margin-bottom: 20px;">Enter your phone number to receive an OTP.</p>
+
+                    <div id="forgotPasswordMessage"></div>
+
+                    <form onsubmit="event.preventDefault();">
+                        <div class="form-group">
+                            <label for="forgotPhone">Phone Number</label>
+                            <div class="phone-input-container">
+                                <input type="tel" id="forgotPhone" placeholder="+91 98765 43210"
+                                    oninput="formatPhoneNumber(this)" required>
+                                <button type="button" id="sendForgotOtpBtn" class="btn-inline"
+                                    onclick="sendForgotPasswordOtp()">Send OTP</button>
+                            </div>
+                        </div>
+
+                        <div id="forgotOtpVerifySection" style="display: none;">
+                            <div class="form-group">
+                                <label>Enter OTP</label>
+                                <div class="otp-actions">
+                                    <input type="text" id="forgotOtpInput" placeholder="Enter OTP" maxlength="6">
+                                    <button type="button" class="btn-inline secondary" id="verifyForgotOtpBtn"
+                                        onclick="verifyForgotPasswordOtp()">Verify</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div id="resetPasswordFields" style="display: none;">
+                            <div class="form-group">
+                                <label for="newPassword">New Password</label>
+                                <input type="password" id="newPassword" required minlength="6">
+                            </div>
+                            <div class="form-group">
+                                <label for="confirmNewPassword">Confirm New Password</label>
+                                <input type="password" id="confirmNewPassword" required minlength="6">
+                            </div>
+                            <button type="button" class="submit-btn" onclick="resetPassword()">Reset Password</button>
+                        </div>
+
+                        <div class="auth-footer">
+                            <p><a href="#" onclick="cancelForgotPassword()">Back to Login</a></p>
+                        </div>
+                    </form>
                 </div>
 
                 <!-- Register Form -->
@@ -702,6 +750,14 @@
         // function to send OTP
         function phoneAuth() {
             var number = document.getElementById('registerPhone').value;
+
+            // Validation
+            const cleanNumber = number.replace(/\D/g, '');
+            if (!number || !number.startsWith('+') || cleanNumber.length !== 12) {
+                showMessage('registerMessage', "Invalid Phone number. Please enter valid phone number.", 'error');
+                return;
+            }
+
             firebase.auth().signInWithPhoneNumber(number, window.recaptchaVerifier).then(function (confirmationResult) {
                 window.confirmationResult = confirmationResult;
                 coderesult = confirmationResult;
@@ -730,7 +786,7 @@
         }
 
         function startOtpTimer() {
-            let timeLeft = 15;
+            let timeLeft = 60;
             const timerText = document.getElementById('otpTimerText');
             const resendBtn = document.getElementById('resendOtpBtn');
             const sendOtpBtn = document.getElementById('sendOtpBtn');
@@ -894,15 +950,36 @@
         function handleLogin(event) {
             event.preventDefault();
 
-            const email = document.getElementById('loginEmail').value;
+            let phone = document.getElementById('loginPhone').value;
             const password = document.getElementById('loginPassword').value;
+
+            // Format phone number - add +91 if no country code provided
+            if (phone && !phone.startsWith('+')) {
+                phone = '+91' + phone;
+            }
+
+            // Normalize phone (remove spaces for comparison if stored without spaces, 
+            // but here we stored with spaces in formatPhoneNumber? 
+            // Actually formatPhoneNumber adds spaces. Let's strip spaces for comparison to be safe 
+            // or assume stored format matches. 
+            // The existing users have '9876543210' (no +91, no spaces).
+            // Let's try to match loosely or enforce format.
+            // For this demo, let's strip non-digits and match last 10 digits to be robust.
+
+            const cleanPhoneInput = phone.replace(/\D/g, '').slice(-10);
 
             // Check if user exists
             let user = null;
             if (currentUserType === 'user') {
-                user = users.find(u => u.email === email && u.password === password);
+                user = users.find(u => {
+                    const uPhone = u.phone.replace(/\D/g, '').slice(-10);
+                    return uPhone === cleanPhoneInput && u.password === password;
+                });
             } else {
-                user = admins.find(a => a.email === email && a.password === password);
+                user = admins.find(a => {
+                    const aPhone = a.phone.replace(/\D/g, '').slice(-10);
+                    return aPhone === cleanPhoneInput && a.password === password;
+                });
             }
 
             if (user) {
@@ -925,7 +1002,7 @@
                     window.location.href = 'index.html';
                 }, 1000);
             } else {
-                showMessage('loginMessage', 'Invalid email or password. Please try again.', 'error');
+                showMessage('loginMessage', 'Invalid phone number or password. Please try again.', 'error');
             }
         }
 
@@ -964,6 +1041,16 @@
             // Ensure phone number starts with +
             if (!phone.startsWith('+')) {
                 showMessage('registerMessage', 'Phone number must start with country code (e.g., +91)!', 'error');
+                return;
+            }
+
+            // Check if phone number already exists
+            const cleanPhoneInput = phone.replace(/\D/g, '').slice(-10);
+            const existingUserPhone = users.find(u => u.phone.replace(/\D/g, '').slice(-10) === cleanPhoneInput);
+            const existingAdminPhone = admins.find(a => a.phone.replace(/\D/g, '').slice(-10) === cleanPhoneInput);
+
+            if (existingUserPhone || existingAdminPhone) {
+                showMessage('registerMessage', 'Phone number already registered! Please use a different number.', 'error');
                 return;
             }
 
@@ -1120,6 +1207,134 @@
                 switchTab('register');
             }
         });
+        // Forgot Password Logic
+        let forgotPasswordConfirmationResult = null;
+
+        function showForgotPassword() {
+            document.querySelectorAll('.auth-form').forEach(f => f.classList.remove('active'));
+            document.getElementById('forgotPasswordSection').style.display = 'block';
+            document.getElementById('forgotPasswordSection').classList.add('active');
+            document.getElementById('loginMessage').innerHTML = '';
+        }
+
+        function cancelForgotPassword() {
+            document.getElementById('forgotPasswordSection').style.display = 'none';
+            document.getElementById('forgotPasswordSection').classList.remove('active');
+            switchTab('login');
+        }
+
+        function sendForgotPasswordOtp() {
+            const phone = document.getElementById('forgotPhone').value;
+            if (!phone || phone.length < 10) {
+                showMessage('forgotPasswordMessage', 'Please enter a valid phone number.', 'error');
+                return;
+            }
+
+            // Check if user exists before sending OTP
+            const cleanPhoneInput = phone.replace(/\D/g, '').slice(-10);
+            let userExists = false;
+
+            // Check in both users and admins
+            const allUsers = [...users, ...admins];
+            const foundUser = allUsers.find(u => {
+                const uPhone = u.phone.replace(/\D/g, '').slice(-10);
+                return uPhone === cleanPhoneInput;
+            });
+
+            if (!foundUser) {
+                showMessage('forgotPasswordMessage', 'No account found with this phone number.', 'error');
+                return;
+            }
+
+            const sendBtn = document.getElementById('sendForgotOtpBtn');
+            sendBtn.disabled = true;
+            sendBtn.textContent = 'Sending...';
+
+            firebase.auth().signInWithPhoneNumber(phone, window.recaptchaVerifier)
+                .then(function (confirmationResult) {
+                    forgotPasswordConfirmationResult = confirmationResult;
+                    showMessage('forgotPasswordMessage', 'OTP sent successfully!', 'success');
+                    document.getElementById('forgotOtpVerifySection').style.display = 'block';
+                    sendBtn.textContent = 'Sent';
+                }).catch(function (error) {
+                    sendBtn.disabled = false;
+                    sendBtn.textContent = 'Send OTP';
+                    showMessage('forgotPasswordMessage', error.message, 'error');
+                });
+        }
+
+        function verifyForgotPasswordOtp() {
+            const code = document.getElementById('forgotOtpInput').value;
+            const verifyBtn = document.getElementById('verifyForgotOtpBtn');
+
+            if (!code) return;
+
+            verifyBtn.textContent = 'Verifying...';
+
+            if (forgotPasswordConfirmationResult) {
+                forgotPasswordConfirmationResult.confirm(code).then(function (result) {
+                    verifyBtn.textContent = 'Verified';
+                    verifyBtn.classList.remove('secondary');
+                    verifyBtn.classList.add('success');
+                    verifyBtn.disabled = true;
+
+                    document.getElementById('resetPasswordFields').style.display = 'block';
+                    showMessage('forgotPasswordMessage', 'Phone verified! Enter new password.', 'success');
+                }).catch(function (error) {
+                    verifyBtn.textContent = 'Invalid';
+                    verifyBtn.classList.add('error');
+                    setTimeout(() => {
+                        verifyBtn.textContent = 'Verify';
+                        verifyBtn.classList.remove('error');
+                    }, 2000);
+                });
+            }
+        }
+
+        function resetPassword() {
+            const newPass = document.getElementById('newPassword').value;
+            const confirmPass = document.getElementById('confirmNewPassword').value;
+            const phone = document.getElementById('forgotPhone').value;
+
+            if (newPass !== confirmPass) {
+                showMessage('forgotPasswordMessage', 'Passwords do not match.', 'error');
+                return;
+            }
+
+            if (newPass.length < 6) {
+                showMessage('forgotPasswordMessage', 'Password must be at least 6 characters.', 'error');
+                return;
+            }
+
+            // Update password in localStorage
+            const cleanPhoneInput = phone.replace(/\D/g, '').slice(-10);
+            let updated = false;
+
+            // Update in users array
+            const userIndex = users.findIndex(u => u.phone.replace(/\D/g, '').slice(-10) === cleanPhoneInput);
+            if (userIndex !== -1) {
+                users[userIndex].password = newPass;
+                localStorage.setItem('drapedrop_users', JSON.stringify(users));
+                updated = true;
+            }
+
+            // Update in admins array
+            const adminIndex = admins.findIndex(a => a.phone.replace(/\D/g, '').slice(-10) === cleanPhoneInput);
+            if (adminIndex !== -1) {
+                admins[adminIndex].password = newPass;
+                localStorage.setItem('drapedrop_admins', JSON.stringify(admins));
+                updated = true;
+            }
+
+            if (updated) {
+                showMessage('forgotPasswordMessage', 'Password reset successful! Redirecting to login...', 'success');
+                setTimeout(() => {
+                    cancelForgotPassword();
+                }, 2000);
+            } else {
+                showMessage('forgotPasswordMessage', 'Error updating password.', 'error');
+            }
+        }
     </script>
 </body>
 
