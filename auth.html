@@ -779,6 +779,8 @@
 
                 if (error.code === 'auth/too-many-requests') {
                     showMessage('registerMessage', "You've reached maximum attempts to generate OTP. Try again later.", 'error');
+                } else if (error.code === 'auth/internal-error') {
+                    showMessage('registerMessage', "Check your internet connection. Try again.", 'error');
                 } else {
                     alert(error.message);
                 }
@@ -846,6 +848,10 @@
                 // Set verified flag and update button state
                 sessionStorage.setItem('otp_phone_verified', 'true');
                 checkRegisterButtonState();
+
+                // Stop the timer
+                if (otpTimerInterval) clearInterval(otpTimerInterval);
+                document.getElementById('otpTimerText').style.display = 'none';
             }).catch(function () {
                 // Error state
                 verifyBtn.textContent = 'Invalid';

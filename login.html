@@ -328,6 +328,38 @@
                 transform: scale(0.8);
             }
         }
+
+        /* Password Requirements UI */
+        .password-reqs {
+            margin-top: 8px;
+            font-size: 0.85rem;
+            color: #666;
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        .req-item {
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: color 0.3s ease;
+        }
+
+        .req-item:last-child {
+            margin-bottom: 0;
+        }
+
+        .req-item i {
+            width: 16px;
+            text-align: center;
+        }
+
+        .req-item.valid {
+            color: #2ecc71;
+            font-weight: 500;
+        }
     </style>
 </head>
 
@@ -482,12 +514,24 @@
 
                         <div class="form-group">
                             <label for="registerPassword">Password</label>
-                            <input type="password" id="registerPassword" required minlength="6">
+                            <input type="password" id="registerPassword" required minlength="8"
+                                onkeyup="checkPasswordStrength(this.value)">
+                            <div class="password-reqs">
+                                <div class="req-item" id="req-len"><i class="far fa-circle"></i> At least 8 characters
+                                </div>
+                                <div class="req-item" id="req-upper"><i class="far fa-circle"></i> One uppercase letter
+                                </div>
+                                <div class="req-item" id="req-lower"><i class="far fa-circle"></i> One lowercase letter
+                                </div>
+                                <div class="req-item" id="req-num"><i class="far fa-circle"></i> One number</div>
+                                <div class="req-item" id="req-spec"><i class="far fa-circle"></i> One special character
+                                </div>
+                            </div>
                         </div>
 
                         <div class="form-group">
                             <label for="registerConfirmPassword">Confirm Password</label>
-                            <input type="password" id="registerConfirmPassword" required minlength="6">
+                            <input type="password" id="registerConfirmPassword" required minlength="8">
                         </div>
 
                         <button type="submit" class="submit-btn">
@@ -659,8 +703,10 @@
                 return;
             }
 
-            if (password.length < 6) {
-                showMessage('registerMessage', 'Password must be at least 6 characters long!', 'error');
+            // Password validation: at least 8 chars, 1 uppercase, 1 lowercase, 1 number, 1 special char
+            const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/;
+            if (!passwordRegex.test(password)) {
+                showMessage('registerMessage', 'Password must be at least 8 characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.', 'error');
                 return;
             }
 
@@ -787,6 +833,28 @@
                 const action = item.type === 'sale' ? 'buy' : 'rent';
                 window.location.href = `checkout.html?id=${item.id}&action=${action}`;
             }
+        }
+
+        function checkPasswordStrength(password) {
+            const rules = [
+                { id: 'req-len', valid: password.length >= 8 },
+                { id: 'req-upper', valid: /[A-Z]/.test(password) },
+                { id: 'req-lower', valid: /[a-z]/.test(password) },
+                { id: 'req-num', valid: /\d/.test(password) },
+                { id: 'req-spec', valid: /[^A-Za-z0-9]/.test(password) }
+            ];
+
+            rules.forEach(rule => {
+                const el = document.getElementById(rule.id);
+                const icon = el.querySelector('i');
+                if (rule.valid) {
+                    el.classList.add('valid');
+                    icon.className = 'fas fa-check-circle';
+                } else {
+                    el.classList.remove('valid');
+                    icon.className = 'far fa-circle';
+                }
+            });
         }
 
         // Image preview function
