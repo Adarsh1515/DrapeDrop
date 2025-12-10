@@ -11,6 +11,7 @@
     <script src="https://www.google.com/recaptcha/api.js"></script>
     <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-database-compat.js"></script>
     <script src="firebase-config.js"></script>
     <style>
         .auth-container {
@@ -620,50 +621,9 @@
         let currentUserType = 'user';
         let currentTab = 'login';
 
-        // Load existing users and admins from localStorage
-        let users = [];
-        let admins = [];
+        // Initialize Firebase Database
+        const db = firebase.database();
 
-        const savedUsers = localStorage.getItem('drapedrop_users');
-        const savedAdmins = localStorage.getItem('drapedrop_admins');
-
-        if (savedUsers) {
-            users = JSON.parse(savedUsers);
-        } else {
-            // Default users
-            users = [
-                {
-                    id: 1,
-                    firstName: 'John',
-                    lastName: 'Doe',
-                    email: 'user@example.com',
-                    phone: '9876543210',
-                    password: 'user123',
-                    type: 'user',
-                    createdAt: new Date().toISOString()
-                }
-            ];
-            localStorage.setItem('drapedrop_users', JSON.stringify(users));
-        }
-
-        if (savedAdmins) {
-            admins = JSON.parse(savedAdmins);
-        } else {
-            // Default admin
-            admins = [
-                {
-                    id: 1,
-                    firstName: 'Seller',
-                    lastName: 'User',
-                    email: 'admin@drapedrop.com',
-                    phone: '9876543210',
-                    password: 'admin123',
-                    type: 'admin',
-                    createdAt: new Date().toISOString()
-                }
-            ];
-            localStorage.setItem('drapedrop_admins', JSON.stringify(admins));
-        }
 
         function switchTab(tab) {
             currentTab = tab;
@@ -964,52 +924,49 @@
                 phone = '+91' + phone;
             }
 
-            // Normalize phone (remove spaces for comparison if stored without spaces, 
-            // but here we stored with spaces in formatPhoneNumber? 
-            // Actually formatPhoneNumber adds spaces. Let's strip spaces for comparison to be safe 
-            // or assume stored format matches. 
-            // The existing users have '9876543210' (no +91, no spaces).
-            // Let's try to match loosely or enforce format.
-            // For this demo, let's strip non-digits and match last 10 digits to be robust.
+            // Determine collection based on user type
+            const collection = currentUserType === 'user' ? 'users' : 'admins';
 
-            const cleanPhoneInput = phone.replace(/\D/g, '').slice(-10);
+            // Query Firebase
+            db.ref(collection).orderByChild('phone').equalTo(phone).once('value')
+                .then(snapshot => {
+                    let user = null;
+                    if (snapshot.exists()) {
+                        snapshot.forEach(childSnapshot => {
+                            const u = childSnapshot.val();
+                            if (u.password === password) {
+                                user = u;
+                            }
+                        });
+                    }
 
-            // Check if user exists
-            let user = null;
-            if (currentUserType === 'user') {
-                user = users.find(u => {
-                    const uPhone = u.phone.replace(/\D/g, '').slice(-10);
-                    return uPhone === cleanPhoneInput && u.password === password;
+                    if (user) {
+                        // Store current user in session (keep using localStorage for session)
+                        const sessionData = {
+                            id: user.id,
+                            firstName: user.firstName,
+                            lastName: user.lastName,
+                            email: user.email,
+                            type: user.type,
+                            loginTime: new Date().toISOString()
+                        };
+
+                        localStorage.setItem('drapedrop_currentUser', JSON.stringify(sessionData));
+
+                        showMessage('loginMessage', 'Login successful! Redirecting...', 'success');
+
+                        // Redirect to appropriate dashboard
+                        setTimeout(() => {
+                            window.location.href = 'index.html';
+                        }, 1000);
+                    } else {
+                        showMessage('loginMessage', 'Invalid phone number or password. Please try again.', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error("Login Result:", error);
+                    showMessage('loginMessage', 'Error logging in. Please try again.', 'error');
                 });
-            } else {
-                user = admins.find(a => {
-                    const aPhone = a.phone.replace(/\D/g, '').slice(-10);
-                    return aPhone === cleanPhoneInput && a.password === password;
-                });
-            }
-
-            if (user) {
-                // Store current user in session
-                const sessionData = {
-                    id: user.id,
-                    firstName: user.firstName,
-                    lastName: user.lastName,
-                    email: user.email,
-                    type: user.type,
-                    loginTime: new Date().toISOString()
-                };
-
-                localStorage.setItem('drapedrop_currentUser', JSON.stringify(sessionData));
-
-                showMessage('loginMessage', 'Login successful! Redirecting...', 'success');
-
-                // Redirect to appropriate dashboard
-                setTimeout(() => {
-                    window.location.href = 'index.html';
-                }, 1000);
-            } else {
-                showMessage('loginMessage', 'Invalid phone number or password. Please try again.', 'error');
-            }
         }
 
         function handleRegister(event) {
@@ -1050,99 +1007,112 @@
                 return;
             }
 
-            // Check if phone number already exists
-            const cleanPhoneInput = phone.replace(/\D/g, '').slice(-10);
-            const existingUserPhone = users.find(u => u.phone.replace(/\D/g, '').slice(-10) === cleanPhoneInput);
-            const existingAdminPhone = admins.find(a => a.phone.replace(/\D/g, '').slice(-10) === cleanPhoneInput);
+            // Determine collection based on user type
+            const collection = currentUserType === 'user' ? 'users' : 'admins';
 
-            if (existingUserPhone || existingAdminPhone) {
-                showMessage('registerMessage', 'Phone number already registered! Please use a different number.', 'error');
-                return;
-            }
+            // Check if phone number or email already exists in the CURRENT collection only
+            Promise.all([
+                db.ref(collection).orderByChild('phone').equalTo(phone).once('value'),
+                db.ref(collection).orderByChild('email').equalTo(email).once('value')
+            ]).then(results => {
+                const phoneSnap = results[0];
+                const emailSnap = results[1];
 
-            // Check if email already exists
-            const existingUser = users.find(u => u.email === email);
-            const existingAdmin = admins.find(a => a.email === email);
-
-            if (existingUser || existingAdmin) {
-                showMessage('registerMessage', 'Email already registered! Please use a different email.', 'error');
-                return;
-            }
-
-            // Create new user/admin object (without saving yet)
-            const newUser = {
-                id: Date.now(),
-                firstName,
-                lastName,
-                email,
-                phone,
-                password,
-                type: currentUserType,
-                createdAt: new Date().toISOString()
-            };
-
-            // For sellers, check if phone OTP is verified
-            if (currentUserType === 'admin') {
-                const phoneVerified = sessionStorage.getItem('otp_phone_verified') === 'true';
-
-                if (!phoneVerified) {
-                    showMessage('registerMessage', `Please verify your phone number via OTP before registering.`, 'error');
+                if (phoneSnap.exists()) {
+                    showMessage('registerMessage', 'Phone number already registered as ' + currentUserType + '! Please use a different number.', 'error');
                     return;
                 }
-            }
 
-            // Save user/admin to localStorage
-            if (currentUserType === 'user') {
-                users.push(newUser);
-                localStorage.setItem('drapedrop_users', JSON.stringify(users));
+                if (emailSnap.exists()) {
+                    showMessage('registerMessage', 'Email already registered as ' + currentUserType + '! Please use a different email.', 'error');
+                    return;
+                }
 
-                // Auto-login for user
-                const sessionData = {
-                    id: newUser.id,
-                    firstName: newUser.firstName,
-                    lastName: newUser.lastName,
-                    email: newUser.email,
-                    type: newUser.type,
-                    loginTime: new Date().toISOString()
+                // Create new user/admin object
+                const newUser = {
+                    id: Date.now(),
+                    firstName,
+                    lastName,
+                    email,
+                    phone,
+                    password,
+                    type: currentUserType,
+                    createdAt: new Date().toISOString()
                 };
-                localStorage.setItem('drapedrop_currentUser', JSON.stringify(sessionData));
 
-                showMessage('registerMessage', 'Registration successful! Redirecting...', 'success');
-                event.target.reset();
+                // For sellers, check if phone OTP is verified
+                if (currentUserType === 'admin') {
+                    const phoneVerified = sessionStorage.getItem('otp_phone_verified') === 'true';
 
-                // Clear OTP verification status
-                sessionStorage.removeItem('otp_phone_verified');
+                    if (!phoneVerified) {
+                        showMessage('registerMessage', `Please verify your phone number via OTP before registering.`, 'error');
+                        return;
+                    }
+                }
 
-                // Reset OTP fields
-                resetOtpFields();
+                const collection = currentUserType === 'user' ? 'users' : 'admins';
 
-                setTimeout(() => { window.location.href = 'index.html'; }, 1000);
-            } else {
-                admins.push(newUser);
-                localStorage.setItem('drapedrop_admins', JSON.stringify(admins));
+                // Save to Firebase
+                // Use push() to generate a key, but we also put the ID inside.
+                // Or set by ID. Let's use push for standard list behavior but maybe unnecessary complexity.
+                // Let's us `set` on `collection + '/' + newUser.id` to have a predictable ID?
+                // `Date.now()` is the ID.
+                db.ref(collection + '/' + newUser.id).set(newUser)
+                    .then(() => {
+                        // Success
+                        if (currentUserType === 'user') {
+                            // Auto-login for user
+                            const sessionData = {
+                                id: newUser.id,
+                                firstName: newUser.firstName,
+                                lastName: newUser.lastName,
+                                email: newUser.email,
+                                type: newUser.type,
+                                loginTime: new Date().toISOString()
+                            };
+                            localStorage.setItem('drapedrop_currentUser', JSON.stringify(sessionData));
 
-                // Auto-login for seller
-                const sessionData = {
-                    id: newUser.id,
-                    firstName: newUser.firstName,
-                    lastName: newUser.lastName,
-                    email: newUser.email,
-                    type: newUser.type,
-                    loginTime: new Date().toISOString()
-                };
-                localStorage.setItem('drapedrop_currentUser', JSON.stringify(sessionData));
+                            showMessage('registerMessage', 'Registration successful! Redirecting...', 'success');
+                            event.target.reset();
 
-                showMessage('registerMessage', 'Registration successful! Redirecting to dashboard...', 'success');
-                event.target.reset();
+                            // Clear OTP verification status
+                            sessionStorage.removeItem('otp_phone_verified');
 
-                // Clear OTP verification status
-                sessionStorage.removeItem('otp_phone_verified');
+                            // Reset OTP fields
+                            resetOtpFields();
 
-                // Reset OTP fields
-                resetOtpFields();
+                            setTimeout(() => { window.location.href = 'index.html'; }, 1000);
+                        } else {
+                            // Auto-login for seller
+                            const sessionData = {
+                                id: newUser.id,
+                                firstName: newUser.firstName,
+                                lastName: newUser.lastName,
+                                email: newUser.email,
+                                type: newUser.type,
+                                loginTime: new Date().toISOString()
+                            };
+                            localStorage.setItem('drapedrop_currentUser', JSON.stringify(sessionData));
 
-                setTimeout(() => { window.location.href = 'index.html'; }, 1000);
-            }
+                            showMessage('registerMessage', 'Registration successful! Redirecting to dashboard...', 'success');
+                            event.target.reset();
+
+                            // Clear OTP verification status
+                            sessionStorage.removeItem('otp_phone_verified');
+
+                            // Reset OTP fields
+                            resetOtpFields();
+
+                            setTimeout(() => { window.location.href = 'index.html'; }, 1000);
+                        }
+                    })
+                    .catch(error => {
+                        showMessage('registerMessage', 'Error saving user data: ' + error.message, 'error');
+                    });
+
+            }).catch(error => {
+                showMessage('registerMessage', 'Error validating registration: ' + error.message, 'error');
+            });
         }
 
         // Function to reset OTP fields and status
@@ -1230,43 +1200,53 @@
         }
 
         function sendForgotPasswordOtp() {
-            const phone = document.getElementById('forgotPhone').value;
+            let phone = document.getElementById('forgotPhone').value;
             if (!phone || phone.length < 10) {
                 showMessage('forgotPasswordMessage', 'Please enter a valid phone number.', 'error');
                 return;
             }
 
-            // Check if user exists before sending OTP
-            const cleanPhoneInput = phone.replace(/\D/g, '').slice(-10);
-            let userExists = false;
-
-            // Check in both users and admins
-            const allUsers = [...users, ...admins];
-            const foundUser = allUsers.find(u => {
-                const uPhone = u.phone.replace(/\D/g, '').slice(-10);
-                return uPhone === cleanPhoneInput;
-            });
-
-            if (!foundUser) {
-                showMessage('forgotPasswordMessage', 'No account found with this phone number.', 'error');
-                return;
+            if (!phone.startsWith('+')) {
+                phone = '+91' + phone;
             }
 
+            // Check if user exists before sending OTP
             const sendBtn = document.getElementById('sendForgotOtpBtn');
             sendBtn.disabled = true;
-            sendBtn.textContent = 'Sending...';
+            sendBtn.textContent = 'Checking...';
 
-            firebase.auth().signInWithPhoneNumber(phone, window.recaptchaVerifier)
-                .then(function (confirmationResult) {
-                    forgotPasswordConfirmationResult = confirmationResult;
-                    showMessage('forgotPasswordMessage', 'OTP sent successfully!', 'success');
-                    document.getElementById('forgotOtpVerifySection').style.display = 'block';
-                    sendBtn.textContent = 'Sent';
-                }).catch(function (error) {
+            Promise.all([
+                db.ref('users').orderByChild('phone').equalTo(phone).once('value'),
+                db.ref('admins').orderByChild('phone').equalTo(phone).once('value')
+            ]).then(results => {
+                const userSnap = results[0];
+                const adminSnap = results[1];
+
+                if (!userSnap.exists() && !adminSnap.exists()) {
+                    showMessage('forgotPasswordMessage', 'No account found with this phone number.', 'error');
                     sendBtn.disabled = false;
                     sendBtn.textContent = 'Send OTP';
-                    showMessage('forgotPasswordMessage', error.message, 'error');
-                });
+                    return;
+                }
+
+                sendBtn.textContent = 'Sending...';
+
+                firebase.auth().signInWithPhoneNumber(phone, window.recaptchaVerifier)
+                    .then(function (confirmationResult) {
+                        forgotPasswordConfirmationResult = confirmationResult;
+                        showMessage('forgotPasswordMessage', 'OTP sent successfully!', 'success');
+                        document.getElementById('forgotOtpVerifySection').style.display = 'block';
+                        sendBtn.textContent = 'Sent';
+                    }).catch(function (error) {
+                        sendBtn.disabled = false;
+                        sendBtn.textContent = 'Send OTP';
+                        showMessage('forgotPasswordMessage', error.message, 'error');
+                    });
+            }).catch(error => {
+                sendBtn.disabled = false;
+                sendBtn.textContent = 'Send OTP';
+                showMessage('forgotPasswordMessage', 'Error checking user: ' + error.message, 'error');
+            });
         }
 
         function verifyForgotPasswordOtp() {
@@ -1300,7 +1280,7 @@
         function resetPassword() {
             const newPass = document.getElementById('newPassword').value;
             const confirmPass = document.getElementById('confirmNewPassword').value;
-            const phone = document.getElementById('forgotPhone').value;
+            let phone = document.getElementById('forgotPhone').value;
 
             if (newPass !== confirmPass) {
                 showMessage('forgotPasswordMessage', 'Passwords do not match.', 'error');
@@ -1312,34 +1292,46 @@
                 return;
             }
 
-            // Update password in localStorage
-            const cleanPhoneInput = phone.replace(/\D/g, '').slice(-10);
-            let updated = false;
-
-            // Update in users array
-            const userIndex = users.findIndex(u => u.phone.replace(/\D/g, '').slice(-10) === cleanPhoneInput);
-            if (userIndex !== -1) {
-                users[userIndex].password = newPass;
-                localStorage.setItem('drapedrop_users', JSON.stringify(users));
-                updated = true;
+            if (!phone.startsWith('+')) {
+                phone = '+91' + phone;
             }
 
-            // Update in admins array
-            const adminIndex = admins.findIndex(a => a.phone.replace(/\D/g, '').slice(-10) === cleanPhoneInput);
-            if (adminIndex !== -1) {
-                admins[adminIndex].password = newPass;
-                localStorage.setItem('drapedrop_admins', JSON.stringify(admins));
-                updated = true;
-            }
+            // Update password in Firebase
+            Promise.all([
+                db.ref('users').orderByChild('phone').equalTo(phone).once('value'),
+                db.ref('admins').orderByChild('phone').equalTo(phone).once('value')
+            ]).then(results => {
+                const userSnap = results[0];
+                const adminSnap = results[1];
+                let updatePromise = null;
 
-            if (updated) {
-                showMessage('forgotPasswordMessage', 'Password reset successful! Redirecting to login...', 'success');
-                setTimeout(() => {
-                    cancelForgotPassword();
-                }, 2000);
-            } else {
-                showMessage('forgotPasswordMessage', 'Error updating password.', 'error');
-            }
+                if (userSnap.exists()) {
+                    userSnap.forEach(child => {
+                        updatePromise = db.ref('users/' + child.key).update({ password: newPass });
+                    });
+                } else if (adminSnap.exists()) {
+                    adminSnap.forEach(child => {
+                        updatePromise = db.ref('admins/' + child.key).update({ password: newPass });
+                    });
+                } else {
+                    showMessage('forgotPasswordMessage', 'User not found.', 'error');
+                    return;
+                }
+
+                if (updatePromise) {
+                    updatePromise.then(() => {
+                        showMessage('forgotPasswordMessage', 'Password reset successful! Redirecting to login...', 'success');
+                        setTimeout(() => {
+                            cancelForgotPassword();
+                        }, 2000);
+                    }).catch(error => {
+                        showMessage('forgotPasswordMessage', 'Error updating password: ' + error.message, 'error');
+                    });
+                }
+
+            }).catch(error => {
+                showMessage('forgotPasswordMessage', 'Error resetting password: ' + error.message, 'error');
+            });
         }
     </script>
 </body>

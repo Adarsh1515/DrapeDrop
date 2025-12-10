@@ -7,7 +7,9 @@ const firebaseConfig = {
     storageBucket: "otp-verification-42b2c.firebasestorage.app",
     messagingSenderId: "856421608135",
     appId: "1:856421608135:web:5d10b52b5a98ea811d2ce2",
-    measurementId: "G-YK31ZKVNTF"
+    measurementId: "G-YK31ZKVNTF",
+    // Database URL - Check your Firebase Console > Project Settings > General to confirm
+    databaseURL: "https://otp-verification-42b2c-default-rtdb.asia-southeast1.firebasedatabase.app"
 };
 
 // Initialize Firebase
