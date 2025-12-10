@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Reproduction Test</title>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-database-compat.js"></script>
+    <script src="firebase-config.js"></script>
+</head>
+
+<body>
+    <h1>Database Access Test</h1>
+    <div id="output">Running...</div>
+    <script>
+        const output = document.getElementById('output');
+        const db = firebase.database();
+
+        // Attempt to read 'users' node
+        db.ref('users').limitToFirst(1).once('value')
+            .then(snapshot => {
+                output.innerHTML = "Success! Data read: " + JSON.stringify(snapshot.val());
+                console.log("Read success");
+            })
+            .catch(error => {
+                output.innerHTML = "Error: " + error.code + " - " + error.message;
+                console.error("Read error", error);
+            });
+    </script>
+</body>
+
+</html>

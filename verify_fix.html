@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Verification Test</title>
+    <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/12.2.1/firebase-database-compat.js"></script>
+    <script src="firebase-config.js"></script>
+    <style>
+        .pass {
+            color: green;
+            font-weight: bold;
+        }
+
+        .fail {
+            color: red;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Login Logic Verification</h1>
+    <div id="output">Initializing...</div>
+
+    <script>
+        const output = document.getElementById('output');
+        const db = firebase.database();
+        const collection = 'users';
+
+        function log(msg, type = 'info') {
+            const div = document.createElement('div');
+            div.textContent = msg;
+            if (type === 'pass') div.className = 'pass';
+            if (type === 'fail') div.className = 'fail';
+            output.appendChild(div);
+            console.log(msg);
+        }
+
+        async function createTestUsers() {
+            // User A: Legacy (With Spaces)
+            await db.ref(collection + '/test_legacy').set({
+                id: 'test_legacy',
+                firstName: 'Test',
+                lastName: 'Legacy',
+                phone: '+91 11111 22222', // Stored WITH spaces
+                password: 'password123',
+                type: 'user'
+            });
+
+            // User B: New (No Spaces)
+            await db.ref(collection + '/test_new').set({
+                id: 'test_new',
+                firstName: 'Test',
+                lastName: 'New',
+                phone: '+913333344444', // Stored WITHOUT spaces
+                password: 'password123',
+                type: 'user'
+            });
+
+            log("Test users created.", 'info');
+        }
+
+        async function attemptLoginMock(phoneInput, password) {
+            log(`Attempting login with input: "${phoneInput}"...`);
+
+            const attemptLoginQuery = (phoneToTry) => {
+                return db.ref(collection).orderByChild('phone').equalTo(phoneToTry).once('value')
+                    .then(snapshot => {
+                        let user = null;
+                        if (snapshot.exists()) {
+                            snapshot.forEach(childSnapshot => {
+                                const u = childSnapshot.val();
+                                if (u.password === password) {
+                                    user = u;
+                                }
+                            });
+                        }
+                        return user;
+                    });
+            };
+
+            const cleanPhone = phoneInput.replace(/\s+/g, '');
+            let legacyPhone = cleanPhone;
+            if (cleanPhone.startsWith('+91') && cleanPhone.length === 13) {
+                const p = cleanPhone;
+                legacyPhone = p.substring(0, 3) + ' ' + p.substring(3, 8) + ' ' + p.substring(8, 13);
+            }
+
+            // 1. Exact
+            let user = await attemptLoginQuery(phoneInput);
+            if (user) return { user, method: 'Exact Match' };
+
+            // 2. Cleaned
+            if (phoneInput !== cleanPhone) {
+                user = await attemptLoginQuery(cleanPhone);
+                if (user) return { user, method: 'Cleaned Match' };
+            }
+
+            // 3. Legacy
+            if (legacyPhone !== phoneInput && legacyPhone !== cleanPhone) {
+                user = await attemptLoginQuery(legacyPhone);
+                if (user) return { user, method: 'Legacy Match' };
+            }
+
+            return { user: null };
+        }
+
+        async function runTests() {
+            try {
+                await createTestUsers();
+
+                // Test 1: Find Legacy User using Spaceless Input
+                // Logged in user types: +911111122222
+                // DB has: +91 11111 22222
+                const result1 = await attemptLoginMock('+911111122222', 'password123');
+                if (result1.user && result1.user.id === 'test_legacy') {
+                    log(`Test 1 Passed: Found Legacy User via "${result1.method}"`, 'pass');
+                } else {
+                    log(`Test 1 Failed: Could not find Legacy User with spaceless input.`, 'fail');
+                }
+
+                // Test 2: Find New User using Spaced Input
+                // Logged in user types: +91 33333 44444
+                // DB has: +913333344444
+                const result2 = await attemptLoginMock('+91 33333 44444', 'password123');
+                if (result2.user && result2.user.id === 'test_new') {
+                    log(`Test 2 Passed: Found New User via "${result2.method}"`, 'pass');
+                } else {
+                    log(`Test 2 Failed: Could not find New User with spaced input.`, 'fail');
+                }
+
+                log("DONE", 'info');
+
+                // Cleanup
+                await db.ref(collection + '/test_legacy').remove();
+                await db.ref(collection + '/test_new').remove();
+
+            } catch (e) {
+                log("Error: " + e.message, 'fail');
+            }
+        }
+
+        runTests();
+    </script>
+</body>
+
+</html>

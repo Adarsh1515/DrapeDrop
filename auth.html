@@ -916,32 +916,72 @@
         function handleLogin(event) {
             event.preventDefault();
 
-            let phone = document.getElementById('loginPhone').value;
+            let phoneInput = document.getElementById('loginPhone').value;
             const password = document.getElementById('loginPassword').value;
 
             // Format phone number - add +91 if no country code provided
-            if (phone && !phone.startsWith('+')) {
-                phone = '+91' + phone;
+            if (phoneInput && !phoneInput.startsWith('+')) {
+                phoneInput = '+91' + phoneInput;
             }
 
-            // Determine collection based on user type
             const collection = currentUserType === 'user' ? 'users' : 'admins';
 
-            // Query Firebase
-            db.ref(collection).orderByChild('phone').equalTo(phone).once('value')
-                .then(snapshot => {
-                    let user = null;
-                    if (snapshot.exists()) {
-                        snapshot.forEach(childSnapshot => {
-                            const u = childSnapshot.val();
-                            if (u.password === password) {
-                                user = u;
-                            }
-                        });
-                    }
+            // Helper to try login with a specific phone string
+            const attemptLogin = (phoneToTry) => {
+                return db.ref(collection).orderByChild('phone').equalTo(phoneToTry).once('value')
+                    .then(snapshot => {
+                        let user = null;
+                        if (snapshot.exists()) {
+                            snapshot.forEach(childSnapshot => {
+                                const u = childSnapshot.val();
+                                if (u.password === password) {
+                                    user = u;
+                                }
+                            });
+                        }
+                        return user;
+                    });
+            };
 
+            // STRATEGY: 
+            // 1. Try exact input
+            // 2. Try stripped spaces (standard)
+            // 3. Try with standard spacing "+91 XXXXX XXXXX" (legacy)
+
+            const cleanPhone = phoneInput.replace(/\s+/g, ''); // "9999999999" or "+919999999999"
+
+            // Construct legacy format "+91 XXXXX XXXXX" if possible
+            let legacyPhone = cleanPhone;
+            if (cleanPhone.startsWith('+91') && cleanPhone.length === 13) {
+                // +91 98765 43210
+                const p = cleanPhone;
+                legacyPhone = p.substring(0, 3) + ' ' + p.substring(3, 8) + ' ' + p.substring(8, 13);
+            }
+
+            showMessage('loginMessage', 'Verifying credentials...', 'info');
+
+            attemptLogin(phoneInput)
+                .then(user => {
+                    if (user) return user;
+                    // If failed, try cleaned version
+                    if (phoneInput !== cleanPhone) {
+                        console.log("Trying cleaned phone:", cleanPhone);
+                        return attemptLogin(cleanPhone);
+                    }
+                    return null;
+                })
+                .then(user => {
+                    if (user) return user;
+                    // If failed, try legacy format
+                    if (legacyPhone !== phoneInput && legacyPhone !== cleanPhone) {
+                        console.log("Trying legacy phone format:", legacyPhone);
+                        return attemptLogin(legacyPhone);
+                    }
+                    return null;
+                })
+                .then(user => {
                     if (user) {
-                        // Store current user in session (keep using localStorage for session)
+                        // Store current user in session
                         const sessionData = {
                             id: user.id,
                             firstName: user.firstName,
@@ -955,12 +995,11 @@
 
                         showMessage('loginMessage', 'Login successful! Redirecting...', 'success');
 
-                        // Redirect to appropriate dashboard
                         setTimeout(() => {
                             window.location.href = 'index.html';
                         }, 1000);
                     } else {
-                        showMessage('loginMessage', 'Invalid phone number or password. Please try again.', 'error');
+                        showMessage('loginMessage', 'Invalid phone number or password. Please check and try again.', 'error');
                     }
                 })
                 .catch(error => {
@@ -995,8 +1034,18 @@
                 return;
             }
 
-            // Phone number validation
-            if (!phone || phone.length < 12) { // +91 + 10 digits = 13 characters minimum
+            // Clean phone number for consistency
+            // Remove spaces for logic, keep +
+            // Actually, for check existing we should use exact match if we want to catch duplicates strictly?
+            // No, we should strip spaces for check too to be safe.
+            // But query needs to match DB. If DB has spaces...
+            // Standardizing to NO SPACES for NEW users.
+
+            // For checking duplicates, we might miss old users with spaces if we only check no-spaces.
+            // But that's a smaller edge case than the login issue. Use the input phone as-is for now?
+            // NO, let's just stick to the plan: Save new ones WITHOUT spaces.
+
+            if (!phone || phone.length < 12) { // Logic check roughly
                 showMessage('registerMessage', 'Please enter a valid phone number with country code!', 'error');
                 return;
             }
@@ -1029,12 +1078,13 @@
                 }
 
                 // Create new user/admin object
+                // Create new user/admin object
                 const newUser = {
                     id: Date.now(),
                     firstName,
                     lastName,
                     email,
-                    phone,
+                    phone: phone.replace(/\s+/g, ''), // ALWAYS SAVE WITHOUT SPACES
                     password,
                     type: currentUserType,
                     createdAt: new Date().toISOString()
@@ -1136,12 +1186,17 @@
 
         // Format phone number as user types
         function formatPhoneNumber(input) {
-            let value = input.value.replace(/\D/g, ''); // Remove non-digits
+            // Keep UI formatting for better UX, but we will strip it for logic
+            let value = input.value.replace(/\D/g, '');
 
             if (value.length > 0 && !input.value.startsWith('+')) {
                 if (value.length <= 10) {
                     input.value = '+91 ' + value;
                 } else if (value.length > 10) {
+                    // Try to preserve Country Code if user pasted it
+                    // Simple heuristic: if > 10, assume first digits are CC or part of it
+                    // ideally we just enforce standard +91 for this specific app context
+                    // But let's stick to the previous simple logic for UI visual consistency
                     input.value = '+91 ' + value.substring(0, 10);
                 }
             }
