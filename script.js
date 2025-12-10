@@ -220,7 +220,7 @@ function openProductDetails(productId) {
 
 // Function to open cart page
 function openCart() {
-    window.location.href = 'cart.html';
+    window.location.href = 'card.html';
 }
 
 // Function to get cart count from localStorage
@@ -788,15 +788,47 @@ function showTab(tabName) {
 function addToCart(productId) {
     const product = products.find(p => p.id === productId);
     if (product) {
-        // Get existing cart from localStorage
+        // Check if user is logged in
+        const currentUser = JSON.parse(localStorage.getItem('drapedrop_currentUser'));
+
+        // Get existing cart from localStorage (for local fallback and immediate UI update)
         let cart = JSON.parse(localStorage.getItem('drapedrop_cart') || '[]');
-        cart.push(product);
-        localStorage.setItem('drapedrop_cart', JSON.stringify(cart));
+
+        if (currentUser && currentUser.id && typeof firebase !== 'undefined') {
+            // SYNC WITH FIREBASE
+            // Initialize database if not already
+            const database = firebase.database();
+
+            // Use User ID
+            const cartRef = database.ref('users/' + currentUser.id + '/cart');
+
+            // Add new item with a UNIQUE KEY
+            const newItemRef = cartRef.push();
+            newItemRef.set(product).then(() => {
+                console.log('Cart item added to Firebase with key:', newItemRef.key);
+            }).catch((error) => {
+                console.error('Error updating Firebase cart:', error);
+            });
+
+            // Still update local storage for immediate UI feedback
+            cart.push(product);
+            localStorage.setItem('drapedrop_cart', JSON.stringify(cart));
+
+        } else {
+            // FALLBACK TO LOCAL STORAGE
+            cart.push(product);
+            localStorage.setItem('drapedrop_cart', JSON.stringify(cart));
+        }
 
         // Update cart count in the UI
         updateCartCountDisplay();
 
         showNotification('Product added to cart!');
+
+        // Redirect to card.html
+        setTimeout(() => {
+            window.location.href = 'card.html';
+        }, 500);
     }
 }
 
@@ -804,8 +836,37 @@ function addToCart(productId) {
 function updateCartCountDisplay() {
     const cartCountElement = document.querySelector('.cart-count');
     if (cartCountElement) {
-        const cart = JSON.parse(localStorage.getItem('drapedrop_cart') || '[]');
-        cartCountElement.textContent = cart.length;
+        // Check if logged in to get count from Firebase (optional, or just use local)
+        // For simplicity and speed, we might still rely on local storage for the count display
+        // if we are keeping them in sync. 
+        // But for cross-device, we should fetch.
+
+        const currentUser = JSON.parse(localStorage.getItem('drapedrop_currentUser'));
+        if (currentUser && currentUser.id && typeof firebase !== 'undefined') {
+            try {
+                const database = firebase.database();
+                const cartRef = database.ref('users/' + currentUser.id + '/cart');
+                cartRef.on('value', (snapshot) => {
+                    const cartData = snapshot.val();
+                    let count = 0;
+                    if (cartData) {
+                        count = Array.isArray(cartData) ? cartData.length : Object.keys(cartData).length;
+                        const cartArray = Array.isArray(cartData) ? cartData : Object.values(cartData);
+                        localStorage.setItem('drapedrop_cart', JSON.stringify(cartArray));
+                    } else {
+                        localStorage.setItem('drapedrop_cart', '[]');
+                    }
+                    cartCountElement.textContent = count;
+                });
+            } catch (e) {
+                console.log('Firebase not ready yet, using local');
+                const cart = JSON.parse(localStorage.getItem('drapedrop_cart') || '[]');
+                cartCountElement.textContent = cart.length;
+            }
+        } else {
+            const cart = JSON.parse(localStorage.getItem('drapedrop_cart') || '[]');
+            cartCountElement.textContent = cart.length;
+        }
     }
 }
 

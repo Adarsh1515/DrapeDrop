@@ -649,6 +649,25 @@
             document.querySelectorAll('.user-type-btn').forEach(btn => btn.classList.remove('active'));
             event.target.classList.add('active');
 
+            // Clear form fields
+            const fieldsToClear = [
+                'registerFirstName',
+                'registerLastName',
+                'registerEmail',
+                'registerPhone',
+                'registerPassword',
+                'registerConfirmPassword',
+                'loginPhone',
+                'loginPassword'
+            ];
+            fieldsToClear.forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.value = '';
+                    if (id === 'registerPhone') el.disabled = false; // Re-enable phone field
+                }
+            });
+
             // Clear OTP verification status when switching user types
             sessionStorage.removeItem('otp_phone_verified');
             const phoneOtpInput = document.getElementById('phoneOtpInput');
@@ -804,6 +823,9 @@
                 verifyBtn.classList.remove('secondary', 'error');
                 verifyBtn.classList.add('success');
                 verifyBtn.disabled = true; // Prevent re-verification
+
+                // Lock the phone number field so user cannot change it after verification
+                document.getElementById('registerPhone').disabled = true;
 
                 // Set verified flag and update button state
                 sessionStorage.setItem('otp_phone_verified', 'true');
@@ -982,11 +1004,13 @@
                 .then(user => {
                     if (user) {
                         // Store current user in session
+                        // Store current user in session
                         const sessionData = {
                             id: user.id,
                             firstName: user.firstName,
                             lastName: user.lastName,
                             email: user.email,
+                            phone: user.phone, // Added phone for cart sync
                             type: user.type,
                             loginTime: new Date().toISOString()
                         };
@@ -1171,6 +1195,7 @@
             const phoneOtpInput = document.getElementById('phoneOtpInput');
             const emailOtpStatus = document.getElementById('emailOtpStatus');
             const phoneOtpStatus = document.getElementById('phoneOtpStatus');
+            const registerPhone = document.getElementById('registerPhone');
 
             if (emailOtpInput) {
                 emailOtpInput.value = '';
@@ -1182,6 +1207,7 @@
             }
             if (emailOtpStatus) emailOtpStatus.textContent = '';
             if (phoneOtpStatus) phoneOtpStatus.textContent = '';
+            if (registerPhone) registerPhone.disabled = false; // Re-enable phone
         }
 
         // Format phone number as user types

@@ -757,7 +757,7 @@ function deleteProduct(productId) {
 }
 
 function openCart() {
-    window.location.href = 'cart.html';
+    window.location.href = 'card.html';
 }
 
 function openProductDetails(productId) {
@@ -830,14 +830,47 @@ function addToCart(productId) {
 
     if (product) {
         // Add complete product details to cart
-        cart.push(product);
-        localStorage.setItem('drapedrop_cart', JSON.stringify(cart));
+        // Check if user is logged in
+        // Check if user is logged in
+        const currentUser = JSON.parse(localStorage.getItem('drapedrop_currentUser'));
+
+        if (currentUser && currentUser.id) {
+            // SYNC WITH FIREBASE
+            // Initialize database if not already
+            const database = firebase.database();
+
+            // Use User ID (timestamp) to match the Auth structure
+            // Path: users/{userId}/cart
+            const cartRef = database.ref('users/' + currentUser.id + '/cart');
+
+            // Add new item with a UNIQUE KEY (item folder)
+            const newItemRef = cartRef.push();
+            newItemRef.set(product).then(() => {
+                console.log('Cart item added to Firebase with key:', newItemRef.key);
+            }).catch((error) => {
+                console.error('Error updating Firebase cart:', error);
+            });
+
+            // Still update local storage for immediate UI feedback
+            cart.push(product);
+            localStorage.setItem('drapedrop_cart', JSON.stringify(cart));
+
+        } else {
+            // FALLBACK TO LOCAL STORAGE
+            cart.push(product);
+            localStorage.setItem('drapedrop_cart', JSON.stringify(cart));
+        }
 
         // Update cart count display
         updateCartCountDisplay();
 
         // Show success notification
         showNotification('Product added to cart successfully!');
+
+        // Redirect to card.html as requested
+        setTimeout(() => {
+            window.location.href = 'card.html';
+        }, 500);
     } else {
         showNotification('Product not found!');
     }
@@ -846,8 +879,43 @@ function addToCart(productId) {
 function updateCartCountDisplay() {
     const cartCountElement = document.querySelector('.cart-count');
     if (cartCountElement) {
-        const cart = JSON.parse(localStorage.getItem('drapedrop_cart') || '[]');
-        cartCountElement.textContent = cart.length;
+        // Check if logged in to get count from Firebase (optional, or just use local)
+        // For simplicity and speed, we might still rely on local storage for the count display
+        // if we are keeping them in sync. 
+        // But for cross-device, we should fetch.
+
+        const currentUser = JSON.parse(localStorage.getItem('drapedrop_currentUser'));
+        if (currentUser && currentUser.id && typeof firebase !== 'undefined') {
+            try {
+                const database = firebase.database();
+                // Use User ID
+                const cartRef = database.ref('users/' + currentUser.id + '/cart');
+
+                cartRef.on('value', (snapshot) => {
+                    const cartData = snapshot.val();
+                    let count = 0;
+                    if (cartData) {
+                        // Handle both Array (legacy) and Object (new) formats
+                        count = Array.isArray(cartData) ? cartData.length : Object.keys(cartData).length;
+
+                        // Sync local storage mostly for the count to be correct across pages
+                        // Converting Object to Array for local storage compatibility
+                        const cartArray = Array.isArray(cartData) ? cartData : Object.values(cartData);
+                        localStorage.setItem('drapedrop_cart', JSON.stringify(cartArray));
+                    } else {
+                        localStorage.setItem('drapedrop_cart', '[]');
+                    }
+                    cartCountElement.textContent = count;
+                });
+            } catch (e) {
+                console.log('Firebase error in count:', e);
+                const cart = JSON.parse(localStorage.getItem('drapedrop_cart') || '[]');
+                cartCountElement.textContent = cart.length;
+            }
+        } else {
+            const cart = JSON.parse(localStorage.getItem('drapedrop_cart') || '[]');
+            cartCountElement.textContent = cart.length;
+        }
     }
 }
 

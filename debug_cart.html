@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <title>Cart Sync Diagnostic Tool (v2)</title>
+    <style>
+        body {
+            font-family: monospace;
+            padding: 20px;
+            line-height: 1.5;
+        }
+
+        .success {
+            color: green;
+        }
+
+        .error {
+            color: red;
+        }
+
+        .warning {
+            color: orange;
+        }
+
+        .section {
+            margin-bottom: 20px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>Cart Sync Diagnostic Tool (v2)</h1>
+
+    <div class="section">
+        <h3>1. Authentication Status (localStorage)</h3>
+        <div id="authStatus">Checking...</div>
+    </div>
+
+    <div class="section">
+        <h3>2. Firebase Configuration</h3>
+        <div id="firebaseStatus">Checking...</div>
+    </div>
+
+    <div class="section">
+        <h3>3. Cart Data Check (Real-time Database)</h3>
+        <button onclick="checkCartData()">Check Cart Data</button>
+        <button onclick="addTestItem()">Add Test Item (Push ID)</button>
+        <div id="dbStatus">Click 'Check Cart Data' to start...</div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-database-compat.js"></script>
+    <script src="firebase-config.js"></script>
+
+    <script>
+        function log(elementId, message, type = 'normal') {
+            const el = document.getElementById(elementId);
+            const div = document.createElement('div');
+            div.textContent = message;
+            if (type === 'success') div.className = 'success';
+            if (type === 'error') div.className = 'error';
+            if (type === 'warning') div.className = 'warning';
+            el.appendChild(div);
+        }
+
+        // 1. Check Auth
+        const authStatus = document.getElementById('authStatus');
+        const currentUser = JSON.parse(localStorage.getItem('drapedrop_currentUser'));
+        let cleanPhone = '';
+
+        if (currentUser) {
+            authStatus.innerHTML = `<span class="success">User Found: ${currentUser.firstName} (ID: ${currentUser.id})</span>`;
+            if (currentUser.id) {
+                // Use ID for path
+                cleanPhone = currentUser.id; // Re-purposing variable name for minimal diff
+                log('authStatus', `User ID (for DB): '${currentUser.id}'`, 'success');
+            } else {
+                log('authStatus', 'User object has no ID!', 'error');
+            }
+        } else {
+            authStatus.innerHTML = '<span class="error">No User Logged In (localStorage "drapedrop_currentUser" is missing)</span>';
+        }
+
+        // 2. Check Firebase
+        const startFirebaseTest = () => {
+            if (typeof firebase !== 'undefined' && firebase.apps.length > 0) {
+                document.getElementById('firebaseStatus').innerHTML = '<span class="success">Firebase Initialized Successfully</span>';
+                return true;
+            } else {
+                document.getElementById('firebaseStatus').innerHTML = '<span class="error">Firebase Not Initialized. Check internet or config.</span>';
+                return false;
+            }
+        };
+        startFirebaseTest();
+
+        // 3. Check Cart Data
+        function checkCartData() {
+            const dbStatus = document.getElementById('dbStatus');
+            dbStatus.innerHTML = 'Connecting to database...';
+
+            if (!cleanPhone) {
+                dbStatus.innerHTML = '<span class="error">Cannot check DB: No valid phone number found. Log in first.</span>';
+                return;
+            }
+
+            const database = firebase.database();
+            const cartRef = database.ref('users/' + cleanPhone + '/cart');
+
+            log('dbStatus', `Looking at path: /users/${cleanPhone}/cart`);
+
+            cartRef.once('value')
+                .then((snapshot) => {
+                    if (snapshot.exists()) {
+                        const val = snapshot.val();
+                        log('dbStatus', 'Data found!', 'success');
+
+                        // Check if it's an array or object (folder structure)
+                        if (Array.isArray(val)) {
+                            log('dbStatus', 'WARNING: Data is in ARRAY format (Old Format).', 'warning');
+                            log('dbStatus', `Item count: ${val.length}`);
+                        } else if (typeof val === 'object') {
+                            const keys = Object.keys(val);
+                            log('dbStatus', 'SUCCESS: Data is in OBJECT/FOLDER format (New Format).', 'success');
+                            log('dbStatus', `Item Count: ${keys.length}`);
+                            log('dbStatus', `Sample Key: ${keys[0]}`);
+                        } else {
+                            log('dbStatus', `Unknown format: ${typeof val}`, 'warning');
+                        }
+                    } else {
+                        log('dbStatus', 'Path is empty (No items in cart).', 'warning');
+                    }
+                })
+                .catch((error) => {
+                    log('dbStatus', `Read Error: ${error.message}`, 'error');
+                });
+        }
+
+        function addTestItem() {
+            const dbStatus = document.getElementById('dbStatus');
+            if (!cleanPhone) {
+                log('dbStatus', 'Cannot write: No valid phone number.', 'error');
+                return;
+            }
+
+            const database = firebase.database();
+            const cartRef = database.ref('users/' + cleanPhone + '/cart');
+
+            const testItem = {
+                id: 999,
+                name: "Test Item " + new Date().toLocaleTimeString(),
+                brand: "Debug",
+                price: 100,
+                addedAt: new Date().toISOString()
+            };
+
+            // PUSH method (New Logic)
+            const newItemRef = cartRef.push();
+
+            newItemRef.set(testItem)
+                .then(() => {
+                    log('dbStatus', `Write Success! Item added with key: ${newItemRef.key}`, 'success');
+                    log('dbStatus', 'Open "Check Cart Data" again to verify.', 'normal');
+                })
+                .catch((error) => {
+                    log('dbStatus', `Write Error: ${error.message}`, 'error');
+                    if (error.code === 'PERMISSION_DENIED') {
+                        log('dbStatus', 'Check Firebase Rules. You might be blocked.', 'error');
+                    }
+                });
+        }
+    </script>
+</body>
+
+</html>
