@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Wishlist - DrapeDrop</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+
+<body>
+
+    <div class="account-page">
+        <!-- Reusing account-page container for background alignment if needed, or just body bg -->
+
+        <div class="sidebar-layout">
+            <!-- Sidebar -->
+            <div class="sidebar">
+                <div class="sidebar-user">
+                    <div class="avatar"><i class="fas fa-user"></i></div>
+                    <div class="sidebar-user-info">
+                        <h3 id="sidebarUserName">Hello, User</h3>
+                    </div>
+                </div>
+
+                <ul class="sidebar-nav">
+                    <li class="sidebar-nav-item">
+                        <a href="my_orders.html" class="sidebar-nav-link">
+                            <span><i class="fas fa-box"></i> My Order</span>
+                            <i class="fas fa-chevron-right" style="font-size: 12px; margin: 0;"></i>
+                        </a>
+                    </li>
+
+                    <div class="sidebar-group-title">Account Setting</div>
+                    <li class="sidebar-nav-item">
+                        <a href="account.html" class="sidebar-nav-link">
+                            <span><i class="fas fa-user-cog"></i> Profile Information</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a href="account.html" class="sidebar-nav-link">
+                            <span><i class="fas fa-map-marker-alt"></i> Manage Addresses</span>
+                        </a>
+                    </li>
+
+                    <div class="sidebar-group-title">Payment</div>
+                    <li class="sidebar-nav-item">
+                        <a href="#" class="sidebar-nav-link">
+                            <span><i class="fas fa-mobile-alt"></i> Saved UPI</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a href="card.html" class="sidebar-nav-link">
+                            <span><i class="fas fa-credit-card"></i> Saved Cards</span>
+                        </a>
+                    </li>
+
+                    <div class="sidebar-group-title">My Stuff</div>
+                    <li class="sidebar-nav-item">
+                        <a href="#" class="sidebar-nav-link">
+                            <span><i class="fas fa-star"></i> My Reviews & Ratings</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a href="#" class="sidebar-nav-link">
+                            <span><i class="fas fa-bell"></i> All Notifications</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a href="#" class="sidebar-nav-link active">
+                            <span><i class="fas fa-heart"></i> My Wishlist</span>
+                        </a>
+                    </li>
+
+                    <li class="sidebar-nav-item" style="margin-top: 20px; border-top: 1px solid #eee;">
+                        <a href="#" id="logoutBtn" class="sidebar-nav-link">
+                            <span><i class="fas fa-sign-out-alt"></i> Logout</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-nav-item">
+                        <a href="#" class="sidebar-nav-link">
+                            <span><i class="fas fa-history"></i> Frequently Visited</span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Main Content -->
+            <div class="main-content-area">
+                <div class="page-header-simple">
+                    <h2>My Wishlist Collection</h2>
+                </div>
+
+                <div class="wishlist-content">
+                    <div class="wishlist-empty-state">
+                        <div class="wishlist-icon-box">
+                            <i class="far fa-heart"></i>
+                        </div>
+                        <h3>Empty Wishlist</h3>
+                        <p>You have no items in your wishlist. Start Adding.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="wishlist.js"></script>
+</body>
+
+</html>

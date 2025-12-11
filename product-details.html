@@ -228,6 +228,65 @@
                 flex-direction: column;
             }
         }
+
+        .wishlist-btn-container {
+            flex-shrink: 0;
+            margin-left: 15px;
+        }
+
+        .wishlist-btn {
+            background: none;
+            border: 2px solid #e1e1e1;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .wishlist-btn:hover {
+            transform: scale(1.1);
+            border-color: #ff6b6b;
+            box-shadow: 0 6px 12px rgba(255, 107, 107, 0.2);
+        }
+
+        .wishlist-btn.active {
+            background: #fff0f0;
+            border-color: #ff6b6b;
+        }
+
+        .wishlist-btn i {
+            color: #ccc;
+            font-size: 1.5rem;
+            transition: all 0.3s ease;
+        }
+
+        .wishlist-btn:hover i {
+            color: #ff6b6b;
+        }
+
+        .wishlist-btn.active i {
+            color: #ff6b6b;
+            animation: pulse 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.3);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
     </style>
 </head>
 
@@ -313,6 +372,11 @@
             if (product) {
                 const images = product.images || {};
                 const primary = product.image || images.front || images.full || images.side || images.back || images.other || product.image;
+
+                // Check wishlist status
+                const wishlist = JSON.parse(localStorage.getItem('drapedrop_wishlist') || '[]');
+                const isInWishlist = wishlist.some(item => item.id === product.id);
+
                 container.innerHTML = `
                     <div class="product-image-section">
                         <div class="image-viewer" id="imageViewer"><img src="${primary}" alt="${product.name}"></div>
@@ -337,7 +401,16 @@
                         </div>
                     </div>
                     <div class="product-info-section">
-                        <h1 class="product-detail-title">${product.name}</h1>
+                        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px;">
+                            <h1 class="product-detail-title" style="margin-bottom: 0; border-bottom: none;">${product.name}</h1>
+                            <div class="wishlist-btn-container">
+                                <button class="wishlist-btn ${isInWishlist ? 'active' : ''}" onclick="toggleWishlist(${product.id})" id="wishlistBtn">
+                                    <i class="${isInWishlist ? 'fas' : 'far'} fa-heart"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div style="border-bottom: 3px solid #667eea; margin-bottom: 30px;"></div>
+                        
                         <div class="product-detail-grid">
                             <div class="detail-item">
                                 <span class="detail-label">Brand:</span>
@@ -454,6 +527,56 @@
 
                 // Show success message
                 alert(`${productToAdd.name} added to cart successfully!`);
+            }
+        }
+
+        function toggleWishlist(productId) {
+            // Check if user is logged in
+            const currentUser = localStorage.getItem('drapedrop_currentUser');
+            if (!currentUser) {
+                alert('Please log in to manage your wishlist!');
+                window.location.href = 'index.html'; // Or show login modal
+                return;
+            }
+
+            // Get product (assuming 'products' and 'product' are available in scope or fetch again)
+            // 'product' variable is global in this script scope
+            if (!product || product.id !== productId) {
+                console.error("Product mismatch or not found");
+                return;
+            }
+
+            let wishlist = JSON.parse(localStorage.getItem('drapedrop_wishlist') || '[]');
+            const index = wishlist.findIndex(item => item.id === productId);
+
+            const btn = document.getElementById('wishlistBtn');
+            const icon = btn.querySelector('i');
+
+            if (index === -1) {
+                // Add to wishlist
+                wishlist.push(product);
+                localStorage.setItem('drapedrop_wishlist', JSON.stringify(wishlist));
+
+                // UI Update
+                if (btn) btn.classList.add('active');
+                if (icon) {
+                    icon.classList.remove('far');
+                    icon.classList.add('fas');
+                }
+
+                // Optional: Show toast/alert
+                // alert('Added to wishlist!');
+            } else {
+                // Remove from wishlist
+                wishlist.splice(index, 1);
+                localStorage.setItem('drapedrop_wishlist', JSON.stringify(wishlist));
+
+                // UI Update
+                if (btn) btn.classList.remove('active');
+                if (icon) {
+                    icon.classList.remove('fas');
+                    icon.classList.add('far');
+                }
             }
         }
 

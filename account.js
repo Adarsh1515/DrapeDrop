@@ -45,5 +45,46 @@
 			window.location.href = 'requests.html';
 		});
 	}
-})();
 
+	const ordersAction = document.getElementById('ordersAction');
+	if (ordersAction) {
+		ordersAction.addEventListener('click', function () {
+			window.location.href = 'my_orders.html';
+		});
+	}
+
+	const wishlistAction = document.getElementById('wishlistAction');
+	if (wishlistAction) {
+		wishlistAction.addEventListener('click', function () {
+			window.location.href = 'wishlist.html';
+		});
+	}
+
+	const helpAction = document.getElementById('helpAction');
+	if (helpAction) {
+		helpAction.addEventListener('click', function () {
+			window.location.href = 'help_center.html';
+		});
+	}
+
+	const editProfileBtn = document.getElementById('editProfileBtn');
+	if (editProfileBtn) {
+		editProfileBtn.addEventListener('click', function () {
+			window.location.href = 'edit_profile.html';
+		});
+	}
+
+	const manageAddressesBtn = document.getElementById('manageAddressesBtn');
+	if (manageAddressesBtn) {
+		manageAddressesBtn.addEventListener('click', function () {
+			window.location.href = 'manage_addresses.html';
+		});
+	}
+
+	const savedCardsBtn = document.getElementById('savedCardsBtn');
+	if (savedCardsBtn) {
+		savedCardsBtn.addEventListener('click', function () {
+			window.location.href = 'saved_cards.html';
+		});
+	}
+})();

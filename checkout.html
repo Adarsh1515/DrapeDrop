@@ -1011,8 +1011,45 @@
         function placeOrder() {
             if (!selectedPaymentMethod) return;
 
+            const currentUser = JSON.parse(localStorage.getItem('drapedrop_currentUser') || '{}');
             const price = action === 'rent' ? product.rentPrice : product.currentPrice;
             const totalAmount = price;
+
+            const processSuccessfulOrder = () => {
+                // Create Order Object
+                const newOrder = {
+                    id: Date.now(), // timestamp as ID
+                    date: new Date().toISOString(),
+                    userEmail: currentUser.email || document.getElementById('email').value,
+                    product: {
+                        name: product.name,
+                        image: product.image,
+                        color: product.color,
+                        size: product.size,
+                        id: product.id
+                    },
+                    total: totalAmount,
+                    status: 'On the way', // Default status for new orders
+                    paymentMethod: selectedPaymentMethod,
+                    address: {
+                        line1: document.getElementById('addressLine1').value,
+                        city: document.getElementById('city').value,
+                        state: document.getElementById('state').value,
+                        pincode: document.getElementById('pincode').value
+                    }
+                };
+
+                // Save to LocalStorage
+                const existingOrders = JSON.parse(localStorage.getItem('drapedrop_orders') || '[]');
+                existingOrders.push(newOrder);
+                localStorage.setItem('drapedrop_orders', JSON.stringify(existingOrders));
+
+                // Success Message
+                alert(`Order placed successfully!\n\nProduct: ${product.name}\nTotal: ₹${totalAmount.toLocaleString('en-IN')}\n\nYou can track this in 'My Orders'.`);
+
+                // Redirect to My Orders
+                window.location.href = 'my_orders.html';
+            };
 
             if (['upi', 'netbanking', 'card', 'emi'].includes(selectedPaymentMethod)) {
                 // Online Payment via Razorpay
@@ -1025,8 +1062,7 @@
                     "image": "https://via.placeholder.com/150?text=DrapeDrop",
                     "handler": function (response) {
                         // Payment Success
-                        alert(`Payment Successful!\nPayment ID: ${response.razorpay_payment_id}\n\nOrder placed successfully!\n\nProduct: ${product.name}\nTotal Amount: ₹${totalAmount.toLocaleString('en-IN')}\n\nThank you for shopping with DrapeDrop!`);
-                        goBack();
+                        processSuccessfulOrder();
                     },
                     "prefill": {
                         "name": document.getElementById('firstName').value + " " + document.getElementById('lastName').value,
@@ -1050,15 +1086,15 @@
                 rzp1.open();
 
             } else {
-                // Cash on Delivery or other offline methods
+                // Cash on Delivery
                 const paymentMessages = {
                     'cod': 'Processing Cash on Delivery order...'
                 };
 
-                alert(`${paymentMessages[selectedPaymentMethod] || 'Processing Order...'}\n\nOrder placed successfully!\n\nProduct: ${product.name}\nPayment Method: ${selectedPaymentMethod.toUpperCase()}\nTotal Amount: ₹${totalAmount.toLocaleString('en-IN')}\n\nThank you for shopping with DrapeDrop!`);
-
-                // Redirect back to products
-                goBack();
+                // Simulate processing delay
+                setTimeout(() => {
+                    processSuccessfulOrder();
+                }, 1000);
             }
         }
 
@@ -1194,88 +1230,110 @@
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Locating...';
             btn.disabled = true;
 
-            const options = {
-                enableHighAccuracy: true,
-                timeout: 10000,
-                maximumAge: 0
-            };
+            // Helper to fetch address from coordinates
+            const fetchAddress = (latitude, longitude) => {
+                fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const address = data.address;
+                        console.log('Address Data:', address);
 
-            navigator.geolocation.getCurrentPosition(
-                (position) => {
-                    const { latitude, longitude } = position.coords;
+                        // Construct Address Line 1
+                        let line1 = [];
+                        if (address.building) line1.push(address.building);
+                        if (address.house_number) line1.push(address.house_number);
+                        if (address.road) line1.push(address.road);
+                        if (address.hamlet && !address.road) line1.push(address.hamlet);
 
-                    fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}`)
-                        .then(response => response.json())
-                        .then(data => {
-                            const address = data.address;
-                            console.log('Address Data:', address); // Debugging
+                        document.getElementById('addressLine1').value = line1.join(', ') || '';
 
-                            // Construct a more detailed Address Line 1
-                            let line1 = [];
-                            if (address.building) line1.push(address.building);
-                            if (address.house_number) line1.push(address.house_number);
-                            if (address.road) line1.push(address.road);
-                            if (address.hamlet && !address.road) line1.push(address.hamlet); // Fallback if no road
+                        // Construct Address Line 2
+                        let line2 = [];
+                        if (address.suburb) line2.push(address.suburb);
+                        if (address.neighbourhood && address.neighbourhood !== address.suburb) line2.push(address.neighbourhood);
+                        if (address.residential) line2.push(address.residential);
 
-                            document.getElementById('addressLine1').value = line1.join(', ') || '';
+                        document.getElementById('addressLine2').value = line2.join(', ');
 
-                            // Construct Address Line 2 with more components
-                            let line2 = [];
-                            if (address.suburb) line2.push(address.suburb);
-                            if (address.neighbourhood && address.neighbourhood !== address.suburb) line2.push(address.neighbourhood);
-                            if (address.residential) line2.push(address.residential);
+                        document.getElementById('city').value =
+                            address.city || address.town || address.village || address.municipality || '';
 
-                            document.getElementById('addressLine2').value = line2.join(', ');
+                        document.getElementById('state').value = address.state || address.region || '';
+                        document.getElementById('pincode').value = address.postcode || '';
 
-                            document.getElementById('city').value =
-                                address.city || address.town || address.village || address.municipality || '';
+                        const countrySelect = document.getElementById('country');
+                        const country = address.country || '';
 
-                            document.getElementById('state').value = address.state || address.region || '';
-                            document.getElementById('pincode').value = address.postcode || '';
-
-                            const countrySelect = document.getElementById('country');
-                            const country = address.country || '';
-
-                            for (let i = 0; i < countrySelect.options.length; i++) {
-                                if (countrySelect.options[i].text.toLowerCase() === country.toLowerCase()) {
-                                    countrySelect.selectedIndex = i;
-                                    break;
-                                }
+                        for (let i = 0; i < countrySelect.options.length; i++) {
+                            if (countrySelect.options[i].text.toLowerCase() === country.toLowerCase()) {
+                                countrySelect.selectedIndex = i;
+                                break;
                             }
+                        }
 
-                            btn.innerHTML = '<i class="fas fa-check"></i> Location Found';
-                            setTimeout(() => {
-                                btn.innerHTML = originalText;
-                                btn.disabled = false;
-                            }, 2000);
-                        })
-                        .catch(error => {
-                            console.error('Error fetching address:', error);
-                            alert("Could not fetch address details. Please enter manually.");
+                        btn.innerHTML = '<i class="fas fa-check"></i> Location Found';
+                        setTimeout(() => {
                             btn.innerHTML = originalText;
                             btn.disabled = false;
-                        });
-                },
-                (error) => {
-                    console.error('Geolocation error:', error);
-                    let msg = "Error getting location";
-                    switch (error.code) {
-                        case error.PERMISSION_DENIED:
-                            msg = "Location permission denied. Please enable location access.";
-                            break;
-                        case error.POSITION_UNAVAILABLE:
-                            msg = "Location information is unavailable.";
-                            break;
-                        case error.TIMEOUT:
-                            msg = "The request to get user location timed out.";
-                            break;
-                    }
-                    alert(msg);
-                    btn.innerHTML = originalText;
-                    btn.disabled = false;
-                },
-                options
-            );
+                        }, 2000);
+                    })
+                    .catch(error => {
+                        console.error('Error fetching address:', error);
+                        alert("Could not fetch address details. Please enter manually.");
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                    });
+            };
+
+            // Strategy: Try High Accuracy first, fallback to Low Accuracy
+            const getLocation = () => {
+                const highAccuracyOptions = {
+                    enableHighAccuracy: true,
+                    timeout: 10000, // 10 seconds for high accuracy
+                    maximumAge: 60000 // Accept 1 min old cached position
+                };
+
+                const lowAccuracyOptions = {
+                    enableHighAccuracy: false,
+                    timeout: 15000, // 15 seconds for low accuracy
+                    maximumAge: 300000 // Accept 5 min old cached position
+                };
+
+                // Attempt 1: High Accuracy
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const { latitude, longitude } = position.coords;
+                        fetchAddress(latitude, longitude);
+                    },
+                    (error) => {
+                        console.warn('High accuracy location failed, trying low accuracy...', error);
+
+                        // Attempt 2: Low Accuracy (Fallback)
+                        navigator.geolocation.getCurrentPosition(
+                            (position) => {
+                                const { latitude, longitude } = position.coords;
+                                fetchAddress(latitude, longitude);
+                            },
+                            (finalError) => {
+                                console.error('All location attempts failed:', finalError);
+                                let msg = "Unable to retrieve your location.";
+                                if (finalError.code === finalError.PERMISSION_DENIED) {
+                                    msg = "Location permission denied. Please allow location access in your browser settings.";
+                                } else if (finalError.code === finalError.TIMEOUT) {
+                                    msg = "Location request timed out. Please check your network or enter address manually.";
+                                }
+                                alert(msg);
+                                btn.innerHTML = originalText;
+                                btn.disabled = false;
+                            },
+                            lowAccuracyOptions
+                        );
+                    },
+                    highAccuracyOptions
+                );
+            };
+
+            getLocation();
         }
 
         // Expose to window

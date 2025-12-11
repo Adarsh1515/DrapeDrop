@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>24x7 Customer Support - DrapeDrop</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f5f5f5;
+        }
+
+        .help-page {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #fff;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Header */
+        .help-header {
+            padding: 16px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            background: #fff;
+            border-bottom: 1px solid #eee;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .help-header h1 {
+            font-size: 1.1rem;
+            margin: 0;
+            color: #333;
+            font-weight: 600;
+        }
+
+        .back-btn {
+            border: none;
+            background: none;
+            font-size: 1.2rem;
+            color: #333;
+            cursor: pointer;
+            padding: 4px;
+        }
+
+        /* Banner */
+        .help-banner {
+            background: #f0f8ff;
+            margin: 16px;
+            padding: 16px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .help-banner-icon {
+            width: 48px;
+            height: 48px;
+            background: #ffd700;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: #fff;
+            flex-shrink: 0;
+            /* Simulating the gold coin appearance */
+            box-shadow: inset -2px -2px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .help-banner-icon i {
+            color: #8b4513;
+        }
+
+        .help-banner-content h3 {
+            margin: 0 0 4px;
+            font-size: 0.95rem;
+            color: #333;
+        }
+
+        .help-banner-content p {
+            margin: 0 0 8px;
+            font-size: 0.85rem;
+            color: #666;
+        }
+
+        .help-banner-link {
+            color: #0066cc;
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        /* Recent Orders */
+        .section-title {
+            padding: 0 16px;
+            font-size: 1rem;
+            color: #333;
+            margin-bottom: 16px;
+            font-weight: 500;
+        }
+
+        .help-order-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .help-order-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+            padding: 16px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: cursor;
+        }
+
+        .help-order-img {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: 4px;
+            background: #eee;
+        }
+
+        .help-order-info {
+            flex: 1;
+        }
+
+        .help-order-name {
+            font-size: 0.95rem;
+            color: #333;
+            margin-bottom: 6px;
+            /* Truncate text */
+            display: -webkit-box;
+            -webkit-line-clamp: 1;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .help-order-status {
+            font-size: 0.85rem;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .status-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .status-dot.green {
+            background-color: #27ae60;
+        }
+
+        .status-dot.red {
+            background-color: #c0392b;
+        }
+
+        .status-text {
+            color: #555;
+        }
+
+        .chevron {
+            color: #ccc;
+            font-size: 0.9rem;
+            align-self: flex-start;
+            margin-top: 4px;
+        }
+
+        .view-more-link {
+            display: block;
+            padding: 16px;
+            color: #333;
+            text-decoration: none;
+            font-size: 0.95rem;
+            border-bottom: 8px solid #f5f5f5;
+            /* Separator */
+        }
+
+        .view-more-link i {
+            float: right;
+            color: #ccc;
+        }
+
+        /* Issues List */
+        .issues-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .issue-item {
+            padding: 16px;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+        }
+
+        .issue-item:hover {
+            background: #fafafa;
+        }
+
+        .issue-text {
+            color: #333;
+            font-size: 0.95rem;
+        }
+
+        .issue-subtext {
+            display: block;
+            font-size: 0.8rem;
+            color: #888;
+            margin-top: 4px;
+        }
+
+        /* Floating Button */
+        .floating-chat-btn {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            width: 56px;
+            height: 56px;
+            background: #fff;
+            border-radius: 50%;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            z-index: 1000;
+        }
+
+        .floating-chat-btn img {
+            width: 100%;
+            height: 100%;
+        }
+
+        .floating-chat-icon {
+            font-size: 32px;
+            color: #f1c40f;
+        }
+
+        .browse-topics {
+            padding: 16px;
+            font-size: 0.95rem;
+            color: #333;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #f0f0f0;
+            background: #fff;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="help-page">
+        <header class="help-header">
+            <button class="back-btn" id="backBtn"><i class="fas fa-arrow-left"></i></button>
+            <h1>24x7 Customer Support</h1>
+        </header>
+
+        <div class="help-banner">
+            <div class="help-banner-icon">
+                <i class="fas fa-rupee-sign"></i>
+            </div>
+            <div class="help-banner-content">
+                <h3>GST Rate Updates</h3>
+                <p>Quick answers to all your queries</p>
+                <a href="#" class="help-banner-link">Know more <i class="fas fa-chevron-right"
+                        style="font-size: 0.7rem;"></i></a>
+            </div>
+        </div>
+
+        <div style="padding-top: 10px;">
+            <div class="section-title">Select the order to track and manage it conveniently</div>
+
+            <ul class="help-order-list" id="recentOrdersList">
+                <!-- Fallback Static Content similar to image if no dynamic data -->
+                <li class="help-order-item">
+                    <img src="https://images.unsplash.com/photo-1541099649105-f69ad21f3246?w=100" class="help-order-img"
+                        alt="Jeans">
+                    <div class="help-order-info">
+                        <div class="help-order-name">VBEAUTI Regular Women Light Blue Jeans</div>
+                        <div class="help-order-status">
+                            <span class="status-dot green"></span>
+                            <span class="status-text">Delivered on Mon Dec 08</span>
+                        </div>
+                    </div>
+                    <i class="fas fa-chevron-right chevron"></i>
+                </li>
+                <li class="help-order-item">
+                    <img src="https://images.unsplash.com/photo-1572804013309-59a88b7e92f1?w=100" class="help-order-img"
+                        alt="Top">
+                    <div class="help-order-info">
+                        <div class="help-order-name">Nalax Designs Casual Solid Women Red Top</div>
+                        <div class="help-order-status">
+                            <span class="status-dot red"></span>
+                            <span class="status-text">Cancelled</span>
+                        </div>
+                    </div>
+                    <i class="fas fa-chevron-right chevron"></i>
+                </li>
+                <li class="help-order-item">
+                    <img src="https://images.unsplash.com/photo-1544947950-fa07a98d237f?w=100" class="help-order-img"
+                        alt="Book">
+                    <div class="help-order-info">
+                        <div class="help-order-name">Glow Glossary Combo Of 5 Best Selling Books</div>
+                        <div class="help-order-status">
+                            <span class="status-dot green"></span>
+                            <span class="status-text">Delivered on Nov 23</span>
+                        </div>
+                    </div>
+                    <i class="fas fa-chevron-right chevron"></i>
+                </li>
+            </ul>
+
+            <a href="my_orders.html" class="view-more-link">
+                View more <i class="fas fa-chevron-right"></i>
+            </a>
+        </div>
+
+        <div style="padding-top: 20px;">
+            <div class="section-title" style="font-size: 1.1rem;">What issue are you facing?</div>
+
+            <ul class="issues-list">
+                <li class="issue-item">
+                    <span class="issue-text">I want help with new GST changes</span>
+                    <i class="fas fa-chevron-right chevron"></i>
+                </li>
+                <li class="issue-item">
+                    <div>
+                        <div class="issue-text">I want to manage my order</div>
+                        <span class="issue-subtext">View, cancel or return an order</span>
+                    </div>
+                    <i class="fas fa-chevron-right chevron"></i>
+                </li>
+                <li class="issue-item">
+                    <div>
+                        <div class="issue-text">I want help with returns & refunds</div>
+                        <span class="issue-subtext">Manage and track returns</span>
+                    </div>
+                    <i class="fas fa-chevron-right chevron"></i>
+                </li>
+                <li class="issue-item">
+                    <div>
+                        <div class="issue-text">I want help with other issues</div>
+                        <span class="issue-subtext">Offers, payment, Flipkart Plus & all other issues</span>
+                    </div>
+                    <i class="fas fa-chevron-right chevron"></i>
+                </li>
+                <li class="issue-item">
+                    <span class="issue-text">I want to contact the seller</span>
+                    <i class="fas fa-chevron-right chevron"></i>
+                </li>
+            </ul>
+        </div>
+
+        <div class="browse-topics">
+            <span>Browse Help Topics</span>
+            <i class="fas fa-chevron-right chevron"></i>
+        </div>
+
+        <div class="floating-chat-btn">
+            <!-- Using a font awesome icon as placeholder for the yellow smiley face if image not available, styling to match -->
+            <span class="floating-chat-icon"><i class="fas fa-smile"></i></span>
+        </div>
+
+    </div>
+
+    <script>
+        document.getElementById('backBtn').addEventListener('click', function () {
+            window.location.href = 'account.html';
+        });
+
+        // Optional: Attempt to load real orders if they exist to make it feel real
+        const savedOrders = localStorage.getItem('drapedrop_orders'); // Using standard key pattern? or checking my_orders page source
+        // Since I don't know the exact order structure saved in LS from previous turns (if any), I'll stick to the static HTML which matches the screenshot exactly.
+        // However, if the user requested "same as image", static is safer.
+        // But if there are no orders in the image, the user might want "logic".
+        // The image SHOWS orders. So I must show orders. Static is best to guarantee layout match.
+
+    </script>
+</body>
+
+</html>

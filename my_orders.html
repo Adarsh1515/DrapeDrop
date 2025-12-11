@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Orders - DrapeDrop</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .my-orders-page {
+            background: #f1f3f6;
+            min-height: 100vh;
+            padding-bottom: 20px;
+        }
+
+        .breadcrumb {
+            padding: 15px 20px;
+            font-size: 0.85rem;
+            color: #878787;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .breadcrumb a {
+            color: #878787;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            color: #2874f0;
+        }
+
+        .main-container {
+            display: flex;
+            gap: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Sidebar Filters */
+        .filters-sidebar {
+            width: 250px;
+            background: white;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .1);
+            border-radius: 2px;
+            height: fit-content;
+            overflow: hidden;
+        }
+
+        .filter-header {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+
+        .filter-group {
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .filter-group h4 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            color: #212121;
+            margin-bottom: 10px;
+            font-weight: 500;
+        }
+
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+            color: #212121;
+            cursor: pointer;
+        }
+
+        .checkbox-item input {
+            cursor: pointer;
+        }
+
+        /* Orders Content */
+        .orders-content {
+            flex: 1;
+        }
+
+        .search-bar {
+            display: flex;
+            gap: 0;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 1px solid #e0e0e0;
+            border-right: none;
+            border-radius: 2px 0 0 2px;
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        .search-btn {
+            background: #2874f0;
+            color: white;
+            border: none;
+            padding: 0 20px;
+            font-weight: 500;
+            cursor: pointer;
+            border-radius: 0 2px 2px 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .order-card {
+            background: white;
+            padding: 15px 20px;
+            margin-bottom: 10px;
+            border-radius: 2px;
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, .1);
+            display: flex;
+            align-items: flex-start;
+            gap: 20px;
+            transition: box-shadow 0.2s;
+            cursor: pointer;
+        }
+
+        .order-card:hover {
+            box-shadow: 0 3px 6px 0 rgba(0, 0, 0, .15);
+        }
+
+        .order-image-container {
+            width: 80px;
+            height: 80px;
+            flex-shrink: 0;
+        }
+
+        .order-image {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .order-info {
+            flex: 2;
+        }
+
+        .order-title {
+            font-weight: 500;
+            color: #212121;
+            margin-bottom: 5px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .order-meta {
+            color: #878787;
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+        }
+
+        .order-price {
+            flex: 1;
+            font-weight: 500;
+            color: #212121;
+        }
+
+        .order-status {
+            flex: 1.5;
+        }
+
+        .status-text {
+            font-weight: 500;
+            font-size: 0.9rem;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+
+        .status-delivered .status-dot {
+            background: #26a541;
+        }
+
+        .status-delivered .status-text {
+            color: #212121;
+            font-weight: 500;
+        }
+
+        .status-cancelled .status-dot {
+            background: #ff6161;
+        }
+
+        .status-cancelled .status-text {
+            color: #212121;
+            font-weight: 500;
+        }
+
+        .status-on-the-way .status-dot {
+            background: #ff9f00;
+        }
+
+        .status-sub {
+            font-size: 0.8rem;
+            color: #212121;
+            margin-bottom: 10px;
+        }
+
+        .rate-link {
+            color: #2874f0;
+            font-size: 0.9rem;
+            font-weight: 500;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .rate-link:hover {
+            text-decoration: underline;
+        }
+
+        @media (max-width: 768px) {
+            .main-container {
+                flex-direction: column;
+            }
+
+            .filters-sidebar {
+                width: 100%;
+                display: none;
+                /* Hide filters on mobile for now */
+            }
+
+            .order-card {
+                flex-direction: column;
+            }
+
+            .order-image-container {
+                width: 60px;
+                height: 60px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="my-orders-page">
+        <!-- Breadcrumb -->
+        <div class="breadcrumb">
+            <a href="index.html">Home</a> &gt;
+            <a href="account.html">My Account</a> &gt;
+            <span>My Orders</span>
+        </div>
+
+        <div class="main-container">
+            <!-- Sidebar -->
+            <aside class="filters-sidebar">
+                <div class="filter-header">Filters</div>
+
+                <div class="filter-group">
+                    <h4>Order Status</h4>
+                    <label class="checkbox-item">
+                        <input type="checkbox"> On the way
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox"> Delivered
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox"> Cancelled
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox"> Returned
+                    </label>
+                </div>
+
+                <div class="filter-group">
+                    <h4>Order Time</h4>
+                    <label class="checkbox-item">
+                        <input type="checkbox"> Last 30 days
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox"> 2024
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox"> 2023
+                    </label>
+                    <label class="checkbox-item">
+                        <input type="checkbox"> Older
+                    </label>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="orders-content">
+                <!-- Search -->
+                <div class="search-bar">
+                    <input type="text" class="search-input" placeholder="Search your orders here">
+                    <button class="search-btn"><i class="fas fa-search"></i> Search Orders</button>
+                </div>
+
+                <!-- Orders List -->
+                <div id="ordersList">
+                    <!-- Orders will be injected here via JS -->
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        // Data Loading Logic
+        document.addEventListener('DOMContentLoaded', () => {
+            const ordersList = document.getElementById('ordersList');
+
+            // Check for logged in user
+            const userJson = localStorage.getItem('drapedrop_currentUser');
+            if (!userJson) {
+                window.location.href = 'login.html';
+                return;
+            }
+            const user = JSON.parse(userJson);
+
+            // Load Orders
+            let orders = [];
+            const savedOrders = localStorage.getItem('drapedrop_orders') || '[]';
+            try {
+                // Parse and filter orders for ONLY the current logged-in user (by email)
+                const allOrders = JSON.parse(savedOrders);
+                orders = allOrders.filter(o => o.userEmail === user.email);
+            } catch (e) {
+                console.error("Error parsing orders", e);
+                orders = [];
+            }
+
+            // Reverse to show newest first
+            orders.reverse();
+
+            if (orders.length === 0) {
+                ordersList.innerHTML = `
+                    <div style="text-align: center; padding: 40px; background: white; border-radius: 2px;">
+                        <img src="https://cdni.iconscout.com/illustration/premium/thumb/empty-cart-2130356-1800917.png" style="width: 200px; opacity: 0.5;">
+                        <h3>No orders found</h3>
+                        <p>Looks like you haven't placed an order yet.</p>
+                        <a href="index.html" style="display: inline-block; margin-top: 10px; background: #2874f0; color: white; padding: 10px 20px; text-decoration: none; border-radius: 2px;">Start Shopping</a>
+                    </div>
+                `;
+                return;
+            }
+
+            ordersList.innerHTML = orders.map(order => {
+                // Determine Status Styles
+                let statusClass = 'status-delivered';
+                let statusText = 'Delivered';
+                let statusSub = 'Your item has been delivered';
+                let iconColor = '#26a541'; // Green
+
+                if (order.status === 'Cancelled') {
+                    statusClass = 'status-cancelled';
+                    statusText = 'Cancelled';
+                    statusSub = 'Order has been cancelled';
+                    iconColor = '#ff6161'; // Red
+                } else if (order.status === 'On the way') {
+                    statusClass = 'status-on-the-way';
+                    statusText = 'On the way';
+                    statusSub = 'Expected delivery soon';
+                    iconColor = '#ff9f00'; // Orange
+                }
+
+                // Format Date
+                const date = new Date(order.date);
+                const dateOptions = { month: 'short', day: 'numeric' };
+                const dateStr = date.toLocaleDateString('en-US', dateOptions);
+
+                return `
+                    <div class="order-card">
+                        <div class="order-image-container">
+                            <img src="${order.product.image}" alt="${order.product.name}" class="order-image">
+                        </div>
+                        <div class="order-info">
+                            <div class="order-title">${order.product.name}</div>
+                            <div class="order-meta">Color: ${order.product.color || 'N/A'} Size: ${order.product.size || 'N/A'}</div>
+                        </div>
+                        <div class="order-price">₹${parseInt(order.total).toLocaleString('en-IN')}</div>
+                        <div class="order-status ${statusClass}">
+                            <div class="status-text">
+                                <span class="status-dot"></span>
+                                ${statusText} on ${dateStr}
+                            </div>
+                            <div class="status-sub">${statusSub}</div>
+                            ${statusClass === 'status-delivered' ?
+                        `<a href="#" class="rate-link"><i class="fas fa-star"></i> Rate & Review Product</a>` : ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        });
+    </script>
+</body>
+
+</html>
